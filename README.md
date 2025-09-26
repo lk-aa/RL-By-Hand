@@ -344,20 +344,18 @@ $`v^*(s) = \max_{\pi\in\Pi} \sum_{a \in A(s)}\pi_k(a|s)\left[ \sum\limits_{r} p(
    **注释**：状态遍历顺序不影响收敛性，但可能影响收敛速度
    
    - **动作评估 (Action Evaluation)**：对每个动作 $a \in A(s)$ 计算：
-     - **期望即时奖励**：  
-$`
-\mathbb{E}[r\|s,a] = \sum_r p(r\|s,a) \cdot r
-`$
+     - **期望即时奖励**：
+$`\mathbb{E}[r\|s,a] = \sum_r p(r\|s,a) \cdot r`$
        - 计算在当前状态执行特定动作的期望即时奖励
-     - **期望未来价值**：  
+     - **期望未来价值**：
 $`\mathbb{E}[v_k(s')\|s,a] = \sum_{s'} p(s'\|s,a) \cdot v_k(s')`$
        - 计算在当前状态执行特定动作后的期望未来累积奖励
-     - **Q值计算 (Q-value Calculation)**：  
+     - **Q值计算 (Q-value Calculation)**：
 $`q_k(s,a) = \mathbb{E}[r\|s,a] + \gamma \cdot \mathbb{E}[v_k(s')\|s,a]`$
        - 综合即时奖励和未来价值的全面评估
    
    - **最优动作选择 (Optimal Action Selection)**：
-     - 找到使Q值最大化的动作：  
+     - 找到使Q值最大化的动作：
 $`a_k^*(s) = \arg\max_{a \in A(s)} q_k(s,a)`$
      - **平局处理策略**：如果多个动作产生相同的最大值：
        - 随机选择一个
@@ -365,17 +363,17 @@ $`a_k^*(s) = \arg\max_{a \in A(s)} q_k(s,a)`$
        - 基于额外启发式规则选择
    
    - **策略更新 (Policy Update)**：
-     - 为状态 $s$ 设置确定性策略：  
+     - 为状态 $s$ 设置确定性策略：
 $`\pi_{k+1}(a\|s) = \begin{cases} 1 & \text{若 } a = a_k^*(s) \\ 0 & \text{否则} \end{cases}`$
      - 策略是确定性的，每个状态对应一个最优动作
    
    - **值函数更新 (Value Function Update)**：
-     - 使用最大Q值更新状态值：  
+     - 使用最大Q值更新状态值：
 $`v_{k+1}(s) = \max_{a \in A(s)} q_k(s,a) = q_k(s, a_k^*(s))`$
      - 这相当于执行一次贝尔曼最优算子
 
 3. **全局收敛检查 (Global Convergence Check)**：
-   - 计算值函数最大变化量：  
+   - 计算值函数最大变化量：
 $`\Delta = \max_{s \in S} \|v_{k+1}(s) - v_k(s)\|`$
    - 如果 $\Delta<\epsilon$，则设置 converged = True
    - 迭代计数器递增： $k\leftarrow{k + 1}$
