@@ -158,7 +158,7 @@ v^{(j+1)}_{\pi_k}(s) = \sum_a \pi_k(a|s) \left[ \sum_r p(r|s,a)r + \gamma \sum_{
      - 更新策略： $\pi_{k+1}(a|s) = 1$ 如果 $a = a_k^*(s)$，否则为0（确定性策略）
 
 3. **策略收敛检查 (Policy Convergence Check)**：
-   - 如果对于所有状态 $s$，$\pi_{k+1}(·|s) = \pi_k(·|s)$（即策略不再改变），则设置 converged = True
+   - 如果对于所有状态 $s$，$\pi_{k+1}(\cdot|s) = \pi_k(\cdot|s)$（即策略不再改变），则设置 converged = True
    - 否则，迭代计数器递增： $k \leftarrow k + 1$
 
 <div style="background:rgba(179, 190, 197, 0.94); padding：10px; border-radius：5px; margin：5px 0;"> 
@@ -178,9 +178,9 @@ v^{(j+1)}_{\pi_k}(s) = \sum_a \pi_k(a|s) \left[ \sum_r p(r|s,a)r + \gamma \sum_{
 
 #### 算法复杂度分析
 - **时间复杂度 (Time Complexity)**： 
-  - 每次策略评估： $O(|S|^2 \times |A|)$ 每次迭代，策略评估需要多次迭代（记作$J$），所以一次策略评估步骤为 $O(J \times |S|^2 \times |A|)$
+  - 每次策略评估： $O(|S|^2 \times |A|)$ 每次迭代，策略评估需要多次迭代（记作 $J$），所以一次策略评估步骤为 $O(J \times |S|^2 \times |A|)$
   - 策略改进： $O(|S|^2 \times |A|)$
-  - 总复杂度： $O(K \times (J \times |S|^2 \times |A| + |S|^2 \times |A|))$，其中 $K$ 是策略迭代次数，$J$ 是策略评估的迭代次数。
+  - 总复杂度： $O(K \times (J \times |S|^2 \times |A| + |S|^2 \times |A|))$，其中 $K$ 是策略迭代次数， $J$ 是策略评估的迭代次数。
   - 策略迭代次数 $K$ 通常很少，因为策略会快速收敛。
 
 - **空间复杂度 (Space Complexity)**： 
