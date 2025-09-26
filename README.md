@@ -99,8 +99,8 @@ solver.env.render()
 
 #### 算法目标
 - **求解贝尔曼最优方程 (Bellman Optimality Equation)**
-    - 找到最优状态值函数 \( v^* \) (Optimal State-Value Function)
-    - 找到最优策略 \( \pi^* \) (Optimal Policy)
+    - 找到最优状态值函数 $ v^* $ (Optimal State-Value Function)
+    - 找到最优策略 $ \pi^* $ (Optimal Policy)
     - 解决序列决策问题中的长期累积奖励最大化问题
 
 - **数学表达**: 
@@ -122,18 +122,18 @@ solver.env.render()
 - **策略改进步骤**：利用当前值函数，对每个状态选择贪婪动作，形成新策略。
 
 #### 输入参数
-- **状态空间 (State Space)**: \( S \) - 所有可能状态的集合
-- **动作空间 (Action Space)**: \( A(s) \) - 在状态 \( s \) 下可用的动作集合
-- **状态转移概率 (State Transition Probabilities)**: \( p(s'|s,a) \) - 从状态 \( s \) 执行动作 \( a \) 后转移到状态 \( s' \) 的概率
-- **奖励概率 (Reward Probabilities)**: \( p(r|s,a) \) - 在状态 \( s \) 执行动作 \( a \) 获得奖励 \( r \) 的概率
-- **折扣因子 (Discount Factor)**: \( \gamma \in [0, 1] \) - 未来奖励的折扣系数
-- **策略评估收敛阈值 (Policy Evaluation Convergence Threshold)**: \( \epsilon \) - 用于判断策略评估步骤中值函数收敛的标准
-- **初始策略 (Initial Policy)**: \( \pi_0 \) - 策略迭代的起始策略
-- **最大迭代次数** \( K_{max} \)（防止无限循环的保险措施）
+- **状态空间 (State Space)**: $ S $ - 所有可能状态的集合
+- **动作空间 (Action Space)**: $ A(s) $ - 在状态 $ s $ 下可用的动作集合
+- **状态转移概率 (State Transition Probabilities)**: $ p(s'|s,a) $ - 从状态 $ s $ 执行动作 $ a $ 后转移到状态 $ s' $ 的概率
+- **奖励概率 (Reward Probabilities)**: $ p(r|s,a) $ - 在状态 $ s $ 执行动作 $ a $ 获得奖励 $ r $ 的概率
+- **折扣因子 (Discount Factor)**: $ \gamma \in [0, 1] $ - 未来奖励的折扣系数
+- **策略评估收敛阈值 (Policy Evaluation Convergence Threshold)**: $ \epsilon $ - 用于判断策略评估步骤中值函数收敛的标准
+- **初始策略 (Initial Policy)**: $ \pi_0 $ - 策略迭代的起始策略
+- **最大迭代次数** $ K_{max} $（防止无限循环的保险措施）
 
 #### 初始化阶段
-- **设置迭代计数器**：\( k = 0 \)
-- **初始化策略**：\( \pi_0 \) 可以是任意策略，通常选择随机策略或贪婪策略（如果有先验知识）
+- **设置迭代计数器**：$ k = 0 $
+- **初始化策略**：$ \pi_0 $ 可以是任意策略，通常选择随机策略或贪婪策略（如果有先验知识）
 - **设置收敛标志**：converged = False
 
 #### 算法流程
@@ -145,24 +145,24 @@ solver.env.render()
 </div>
 
 1. **策略评估 (Policy Evaluation)**：
-   - 目标：计算当前策略 \( \pi_k \) 的值函数 \( v_{\pi_k} \)
-   - 初始化：设置 \( v^{(0)}_{\pi_k} \) 为任意值（例如全零）
-   - 迭代：使用贝尔曼期望方程进行迭代，直到值函数收敛（变化小于阈值 \( \epsilon \)）
-     - 对于每个状态 \( s \in S \)：
+   - 目标：计算当前策略 $ \pi_k $ 的值函数 $ v_{\pi_k} $
+   - 初始化：设置 $ v^{(0)}_{\pi_k} $ 为任意值（例如全零）
+   - 迭代：使用贝尔曼期望方程进行迭代，直到值函数收敛（变化小于阈值 $ \epsilon $）
+     - 对于每个状态 $ s \in S $：
        \[ v^{(j+1)}_{\pi_k}(s) = \sum_a \pi_k(a|s) \left[ \sum_r p(r|s,a)r + \gamma \sum_{s'} p(s'|s,a) v^{(j)}_{\pi_k}(s') \right] \]
-   - 输出：收敛的值函数 \( v_{\pi_k} \)
+   - 输出：收敛的值函数 $ v_{\pi_k} $
 
 2. **策略改进 (Policy Improvement)**：
-   - 目标：根据当前值函数 \( v_{\pi_k} \) 改进策略
-   - 对于每个状态 \( s \in S \)：
-     - 对于每个动作 \( a \in A(s) \)，计算动作值函数：
+   - 目标：根据当前值函数 $ v_{\pi_k} $ 改进策略
+   - 对于每个状态 $ s \in S $：
+     - 对于每个动作 $ a \in A(s) $，计算动作值函数：
        \[ q_{\pi_k}(s,a) = \sum_r p(r|s,a)r + \gamma \sum_{s'} p(s'|s,a) v_{\pi_k}(s') \]
-     - 选择贪婪动作：\( a_k^*(s) = \arg\max_{a \in A(s)} q_{\pi_k}(s,a) \)
-     - 更新策略：\( \pi_{k+1}(a|s) = 1 \) 如果 \( a = a_k^*(s) \)，否则为0（确定性策略）
+     - 选择贪婪动作：$ a_k^*(s) = \arg\max_{a \in A(s)} q_{\pi_k}(s,a) $
+     - 更新策略：$ \pi_{k+1}(a|s) = 1 $ 如果 $ a = a_k^*(s) $，否则为0（确定性策略）
 
 3. **策略收敛检查 (Policy Convergence Check)**：
-   - 如果对于所有状态 \( s \)，\( \pi_{k+1}(·|s) = \pi_k(·|s) \)（即策略不再改变），则设置 converged = True
-   - 否则，迭代计数器递增：\( k \leftarrow k + 1 \)
+   - 如果对于所有状态 $ s $，$ \pi_{k+1}(·|s) = \pi_k(·|s) $（即策略不再改变），则设置 converged = True
+   - 否则，迭代计数器递增：$ k \leftarrow k + 1 $
 
 <div style="background:rgba(179, 190, 197, 0.94); padding: 10px; border-radius: 5px; margin: 5px 0;"> 
 <strong>主迭代循环结束</strong>
@@ -170,32 +170,32 @@ solver.env.render()
 </div>
 
 #### 终止与输出
-- **收敛条件**：当策略不再改变（即 \( \pi_{k+1} = \pi_k \)）或 \( k \geq K_{max} \) 时算法终止
+- **收敛条件**：当策略不再改变（即 $ \pi_{k+1} = \pi_k $）或 $ k \geq K_{max} $ 时算法终止
 - **输出结果**：
-  - **最优值函数 (Optimal Value Function)**: \( v^* = v_{\pi_k} \)
-  - **最优策略 (Optimal Policy)**: \( \pi^* = \pi_k \)
-  - **实际迭代次数**: \( k \)
+  - **最优值函数 (Optimal Value Function)**: $ v^* = v_{\pi_k} $
+  - **最优策略 (Optimal Policy)**: $ \pi^* = \pi_k $
+  - **实际迭代次数**: $ k $
 - **算法保证**：
   - 由于策略改进定理，每次迭代策略都会改进，直到达到最优策略。
   - 最终得到的策略是最优策略，值函数是最优值函数。
 
 #### 算法复杂度分析
 - **时间复杂度 (Time Complexity)**： 
-  - 每次策略评估：\( O(|S|^2 \times |A|) \) 每次迭代，策略评估需要多次迭代（记作\( J \)），所以一次策略评估步骤为 \( O(J \times |S|^2 \times |A|) \)
-  - 策略改进：\( O(|S|^2 \times |A|) \)
-  - 总复杂度：\( O(K \times (J \times |S|^2 \times |A| + |S|^2 \times |A|)) \)，其中 \( K \) 是策略迭代次数，\( J \) 是策略评估的迭代次数。
-  - 策略迭代次数 \( K \) 通常很少，因为策略会快速收敛。
+  - 每次策略评估：$ O(|S|^2 \times |A|) $ 每次迭代，策略评估需要多次迭代（记作$ J $），所以一次策略评估步骤为 $ O(J \times |S|^2 \times |A|) $
+  - 策略改进：$ O(|S|^2 \times |A|) $
+  - 总复杂度：$ O(K \times (J \times |S|^2 \times |A| + |S|^2 \times |A|)) $，其中 $ K $ 是策略迭代次数，$ J $ 是策略评估的迭代次数。
+  - 策略迭代次数 $ K $ 通常很少，因为策略会快速收敛。
 
 - **空间复杂度 (Space Complexity)**： 
-  - \( O(|S| \times |A|) \) 存储转移概率和奖励函数
-  - \( O(|S|) \) 存储值函数
-  - \( O(|S| \times |A|) \) 存储策略（对于确定性策略，可以只存储每个状态的动作，即 \( O(|S|) \)）
+  - $ O(|S| \times |A|) $ 存储转移概率和奖励函数
+  - $ O(|S|) $ 存储值函数
+  - $ O(|S| \times |A|) $ 存储策略（对于确定性策略，可以只存储每个状态的动作，即 $ O(|S|) $）
 
 - **收敛速率 (Convergence Rate)**： 
   - 策略迭代通常以线性速率收敛，但由于策略空间有限，实际迭代次数很少。
 
 #### 关键性质
-- **单调改进 (Monotonic Improvement)**: 每次策略改进都会产生一个更好的策略，即 \( v_{\pi_{k+1}} \geq v_{\pi_k} \)（逐点成立）
+- **单调改进 (Monotonic Improvement)**: 每次策略改进都会产生一个更好的策略，即 $ v_{\pi_{k+1}} \geq v_{\pi_k} $（逐点成立）
 - **有限收敛 (Finite Convergence)**: 由于策略数量有限，算法在有限步内收敛。
 - **最优性条件 (Optimality Condition)**: 收敛时满足贝尔曼最优方程。
 
@@ -291,8 +291,8 @@ solver.env.render()
 
 #### 算法目标
 - **求解贝尔曼最优方程 (Bellman Optimality Equation)**
-    - 找到最优状态值函数 \( v^* \) (Optimal State-Value Function)
-    - 找到最优策略 \( \pi^* \) (Optimal Policy)
+    - 找到最优状态值函数 $ v^* $ (Optimal State-Value Function)
+    - 找到最优策略 $ \pi^* $ (Optimal Policy)
     - 解决序列决策问题中的长期累积奖励最大化问题
 
 - **数学表达**: 
@@ -317,21 +317,21 @@ $$
 - **异步收敛** (Asynchronous Convergence): 即使值函数更新顺序任意，算法仍能保证收敛。
 
 #### 输入参数
-- **状态空间 (State Space)**: \( S \) - 所有可能状态的集合
-- **动作空间 (Action Space)**: \( A(s) \) - 在状态 \( s \) 下可用的动作集合
-- **状态转移概率 (State Transition Probabilities)**: \( p(s'\|s,a) \) - 从状态 \( s \) 执行动作 \( a \) 后转移到状态 \( s' \) 的概率
-- **奖励概率 (Reward Probabilities)**: \( p(r\|s,a) \) - 在状态 \( s \) 执行动作 \( a \) 获得奖励 \( r \) 的概率
-- **折扣因子 (Discount Factor)**: \( \gamma \in [0, 1] \) - 未来奖励的折扣系数，γ=0表示只考虑即时奖励，γ=1表示平等对待所有未来奖励
-- **收敛阈值 (Convergence Threshold)**: \( \epsilon > 0 \) - 值函数收敛的判断标准，通常取较小的正数（如10⁻⁶）
-- **初始值函数估计 (Initial Value Function Estimate)**: \( v_0(s) \) - 对每个状态 \( s \in S \) 的初始价值估计，可以设为0或随机值
-- **最大迭代次数** \( K_{max} \)（防止无限循环的保险措施）
+- **状态空间 (State Space)**: $ S $ - 所有可能状态的集合
+- **动作空间 (Action Space)**: $ A(s) $ - 在状态 $ s $ 下可用的动作集合
+- **状态转移概率 (State Transition Probabilities)**: $ p(s'\|s,a) $ - 从状态 $ s $ 执行动作 $ a $ 后转移到状态 $ s' $ 的概率
+- **奖励概率 (Reward Probabilities)**: $ p(r\|s,a) $ - 在状态 $ s $ 执行动作 $ a $ 获得奖励 $ r $ 的概率
+- **折扣因子 (Discount Factor)**: $ \gamma \in [0, 1] $ - 未来奖励的折扣系数，γ=0表示只考虑即时奖励，γ=1表示平等对待所有未来奖励
+- **收敛阈值 (Convergence Threshold)**: $ \epsilon > 0 $ - 值函数收敛的判断标准，通常取较小的正数（如10⁻⁶）
+- **初始值函数估计 (Initial Value Function Estimate)**: $ v_0(s) $ - 对每个状态 $ s \in S $ 的初始价值估计，可以设为0或随机值
+- **最大迭代次数** $ K_{max} $（防止无限循环的保险措施）
 
 #### 初始化阶段
-- **设置迭代计数器**：\( k = 0 \)
+- **设置迭代计数器**：$ k = 0 $
 - **初始化值函数**：
-  \( v_0(s) \) 对所有状态 \( s \in S \)
+  $ v_0(s) $ 对所有状态 $ s \in S $
   - 常见初始化方法：全零初始化、随机初始化、基于启发式的初始化
-- **初始化策略**：\( \pi_0 \) 
+- **初始化策略**：$ \pi_0 $ 
   - 可以是任意策略或基于初始值函数的贪婪策略
   - 初始策略对最终结果无影响，但可能影响收敛速度
 - **设置收敛标志**：converged = False
@@ -344,13 +344,13 @@ $$
 </div>
 
 1. **收敛判断 (Convergence Check)**：
-   当 \( \|v_k - v_{k-1}\|_\infty > \epsilon \) 且 \( k < K_{max} \) 时继续迭代
+   当 $ \|v_k - v_{k-1}\|_\infty > \epsilon $ 且 $ k < K_{max} $ 时继续迭代
    - 使用无穷范数确保所有状态的值函数变化都小于阈值
 
-2. **状态遍历 (State Iteration)**：对每个状态 \( s \in S \) 执行以下操作：
+2. **状态遍历 (State Iteration)**：对每个状态 $ s \in S $ 执行以下操作：
    **注释**：状态遍历顺序不影响收敛性，但可能影响收敛速度
    
-   - **动作评估 (Action Evaluation)**：对每个动作 \( a \in A(s) \) 计算：
+   - **动作评估 (Action Evaluation)**：对每个动作 $ a \in A(s) $ 计算：
      - **期望即时奖励**：$$ \mathbb{E}[r\|s,a] = \sum_r p(r\|s,a) \cdot r $$
        - 计算在当前状态执行特定动作的期望即时奖励
      - **期望未来价值**：$$ \mathbb{E}[v_k(s')\|s,a] = \sum_{s'} p(s'\|s,a) \cdot v_k(s') $$
@@ -367,7 +367,7 @@ $$
        - 基于额外启发式规则选择
    
    - **策略更新 (Policy Update)**：
-     - 为状态 \( s \) 设置确定性策略：
+     - 为状态 $ s $ 设置确定性策略：
        $$ \pi_{k+1}(a\|s) = \begin{cases} 1 & \text{若 } a = a_k^*(s) \\ 0 & \text{否则} \end{cases} $$
      - 策略是确定性的，每个状态对应一个最优动作
    
@@ -379,8 +379,8 @@ $$
 3. **全局收敛检查 (Global Convergence Check)**：
    - 计算值函数最大变化量：
      $$ \Delta = \max_{s \in S} \|v_{k+1}(s) - v_k(s)\| $$
-   - 如果 \( \Delta < \epsilon \)，则设置 converged = True
-   - 迭代计数器递增：\( k \leftarrow k + 1 \)
+   - 如果 $ \Delta < \epsilon $，则设置 converged = True
+   - 迭代计数器递增：$ k \leftarrow k + 1 $
 
 <div style="background:rgba(179, 190, 197, 0.94); padding: 10px; border-radius: 5px; margin: 5px 0;"> 
 <strong>主迭代循环结束</strong>
@@ -388,37 +388,37 @@ $$
 </div>
 
 #### 终止与输出
-- **收敛条件**：当 \( \Delta < \epsilon \) 或 \( k \geq K_{max} \) 时算法终止
+- **收敛条件**：当 $ \Delta < \epsilon $ 或 $ k \geq K_{max} $ 时算法终止
 - **输出结果**：
-  - **最优值函数 (Optimal Value Function)**: \( v^* = v_k \)
-  - **最优策略 (Optimal Policy)**: \( \pi^* = \pi_k \)
-  - **实际迭代次数**: \( k \)
+  - **最优值函数 (Optimal Value Function)**: $ v^* = v_k $
+  - **最优策略 (Optimal Policy)**: $ \pi^* = \pi_k $
+  - **实际迭代次数**: $ k $
 - **算法保证**：
-  - \( v^* \) 满足贝尔曼最优方程
-  - \( \pi^* \) 是相对于初始状态分布的最优策略
-  - 对于充分小的 \( \epsilon \)，得到的策略是 \( \epsilon \)-最优的
-  - 误差界限：\( \|v_k - v^*\|_\infty \leq \frac{\gamma^k}{1-\gamma} \|v_1 - v_0\|_\infty \)
+  - $ v^* $ 满足贝尔曼最优方程
+  - $ \pi^* $ 是相对于初始状态分布的最优策略
+  - 对于充分小的 $ \epsilon $，得到的策略是 $ \epsilon $-最优的
+  - 误差界限：$ \|v_k - v^*\|_\infty \leq \frac{\gamma^k}{1-\gamma} \|v_1 - v_0\|_\infty $
 - **验证方法**：可以通过策略评估验证所得策略的性能
 
 #### 算法复杂度分析
 - **时间复杂度 (Time Complexity)**： 
-  - 每次迭代：\( O(\|S\|^2 \times \|A\|) \)
-  - 总复杂度：\( O(K \times \|S\|^2 \times \|A\|) \)，其中 \( K \) 是迭代次数
-  - 迭代次数 \( K \) 取决于 \( \gamma \) 和 \( \epsilon \)，通常为 \( O\left(\frac{\log(1/\epsilon)}{1-\gamma}\right) \)
-  - 迭代次数上界：\( K = \left\lceil \frac{\log(\epsilon(1-\gamma)) - \log(\|v_1 - v_0\|_\infty)}{\log(\gamma)} \right\rceil \)
+  - 每次迭代：$ O(\|S\|^2 \times \|A\|) $
+  - 总复杂度：$ O(K \times \|S\|^2 \times \|A\|) $，其中 $ K $ 是迭代次数
+  - 迭代次数 $ K $ 取决于 $ \gamma $ 和 $ \epsilon $，通常为 $ O\left(\frac{\log(1/\epsilon)}{1-\gamma}\right) $
+  - 迭代次数上界：$ K = \left\lceil \frac{\log(\epsilon(1-\gamma)) - \log(\|v_1 - v_0\|_\infty)}{\log(\gamma)} \right\rceil $
 
 - **空间复杂度 (Space Complexity)**： 
-  - \( O(\|S\| \times \|A\|) \) 存储转移概率和奖励函数
-  - \( O(\|S\|) \) 存储值函数
-  - \( O(\|S\|) \) 存储策略
+  - $ O(\|S\| \times \|A\|) $ 存储转移概率和奖励函数
+  - $ O(\|S\|) $ 存储值函数
+  - $ O(\|S\|) $ 存储策略
 
 - **收敛速率 (Convergence Rate)**： 
-  - 线性收敛：\( \|v_{k+1} - v^*\|_\infty \leq \gamma \|v_k - v^*\|_\infty \)
-  - 误差界限：\( \|v_k - v^*\|_\infty \leq \frac{\gamma^k}{1-\gamma} \|v_1 - v_0\|_\infty \)
+  - 线性收敛：$ \|v_{k+1} - v^*\|_\infty \leq \gamma \|v_k - v^*\|_\infty $
+  - 误差界限：$ \|v_k - v^*\|_\infty \leq \frac{\gamma^k}{1-\gamma} \|v_1 - v_0\|_\infty $
 
 #### 关键性质
-- **单调改进 (Monotonic Improvement)**: \( v_{k+1}(s) \geq v_k(s) \) 对所有 \( s \in S \)
-- **压缩映射 (Contraction Mapping)**: 贝尔曼最优算子是模为 \( \gamma \) 的压缩映射
+- **单调改进 (Monotonic Improvement)**: $ v_{k+1}(s) \geq v_k(s) $ 对所有 $ s \in S $
+- **压缩映射 (Contraction Mapping)**: 贝尔曼最优算子是模为 $ \gamma $ 的压缩映射
 - **最优性条件 (Optimality Condition)**: 收敛时满足贝尔曼最优方程
 - **策略收敛 (Policy Convergence)**: 最优策略可能在值函数收敛之前就已稳定
 - **异步收敛 (Asynchronous Convergence)**: 支持异步更新，但同步更新保证收敛
@@ -434,7 +434,7 @@ $$
 **缺点**：
 - 对于大规模状态空间，计算成本高（维度灾难 Curse of Dimensionality）
 - 需要完整的环境模型（转移概率和奖励函数）
-- 收敛速度可能较慢，特别是当 \( \gamma \) 接近1时
+- 收敛速度可能较慢，特别是当 $ \gamma $ 接近1时
 - 同步更新：基本版本需要扫描所有状态，可能效率不高
 
 #### 应用场景
