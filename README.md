@@ -6,9 +6,9 @@
 
 项目包含以下主要文件：
 
-- **grid_env.py**: 定义了网格世界环境，基于OpenAI Gymnasium框架构建
-- **render.py**: 实现了网格世界的可视化功能
-- **solver.py**: 包含了多种强化学习算法的实现
+- **grid_env.py**：定义了网格世界环境，基于OpenAI Gymnasium框架构建
+- **render.py**：实现了网格世界的可视化功能
+- **solver.py**：包含了多种强化学习算法的实现
 
 ## 核心功能
 
@@ -103,7 +103,7 @@ solver.env.render()
     - 找到最优策略 $\pi^*$ (Optimal Policy)
     - 解决序列决策问题中的长期累积奖励最大化问题
 
-- **数学表达**: 
+- **数学表达**：
   策略迭代不直接求解贝尔曼最优方程，而是通过迭代策略来逼近最优策略。每次迭代包括两个步骤：
   1. 策略评估：计算当前策略的状态值函数。
   2. 策略改进：根据当前值函数改进策略。
@@ -112,23 +112,19 @@ solver.env.render()
 - **数学基础**：基于策略评估和策略改进定理。
   - **策略评估**：对于固定策略 $\pi$，通过迭代求解贝尔曼方程得到该策略的状态值函数 $v_{\pi}$。
   - **策略改进**：根据 $v_{\pi}$，通过选择每个状态下的最优动作来改进策略。
-
 - **核心思想**：通过交替执行策略评估和策略改进，逐步提升策略的质量，直至策略不再改变。
-
 - **收敛性保证**：由于策略改进定理，每次迭代都会产生一个严格更好的策略（除非已经最优）。由于策略数量有限，算法会在有限步内收敛。
-
 - **策略评估步骤**：通过迭代贝尔曼期望方程来求解当前策略的值函数。
-
 - **策略改进步骤**：利用当前值函数，对每个状态选择贪婪动作，形成新策略。
 
 #### 输入参数
-- **状态空间 (State Space)**: $S$ - 所有可能状态的集合
-- **动作空间 (Action Space)**: $A(s)$ - 在状态 $s$ 下可用的动作集合
-- **状态转移概率 (State Transition Probabilities)**: $p(s'|s,a)$ - 从状态 $s$ 执行动作 $a$ 后转移到状态 $s'$ 的概率
-- **奖励概率 (Reward Probabilities)**: $p(r|s,a)$ - 在状态 $s$ 执行动作 $a$ 获得奖励 $r$ 的概率
-- **折扣因子 (Discount Factor)**: $\gamma \in [0, 1]$ - 未来奖励的折扣系数
-- **策略评估收敛阈值 (Policy Evaluation Convergence Threshold)**: $\epsilon$ - 用于判断策略评估步骤中值函数收敛的标准
-- **初始策略 (Initial Policy)**: $\pi_0$ - 策略迭代的起始策略
+- **状态空间 (State Space)**：$S$ - 所有可能状态的集合
+- **动作空间 (Action Space)**：$A(s)$ - 在状态 $s$ 下可用的动作集合
+- **状态转移概率 (State Transition Probabilities)**：$p(s'|s,a)$ - 从状态 $s$ 执行动作 $a$ 后转移到状态 $s'$ 的概率
+- **奖励概率 (Reward Probabilities)**：$p(r|s,a)$ - 在状态 $s$ 执行动作 $a$ 获得奖励 $r$ 的概率
+- **折扣因子 (Discount Factor)**：$\gamma \in [0, 1]$ - 未来奖励的折扣系数
+- **策略评估收敛阈值 (Policy Evaluation Convergence Threshold)**：$\epsilon$ - 用于判断策略评估步骤中值函数收敛的标准
+- **初始策略 (Initial Policy)**：$\pi_0$ - 策略迭代的起始策略
 - **最大迭代次数** $K_{max}$（防止无限循环的保险措施）
 
 #### 初始化阶段
@@ -138,9 +134,9 @@ solver.env.render()
 
 #### 算法流程
 
-<div style="background-color: #f0f0f0; padding: 10px; border-radius: 5px;">
+<div style="background-color：#f0f0f0; padding：10px; border-radius：5px;">
 
-<div style="background:rgba(179, 190, 197, 0.94); padding: 10px; border-radius: 5px; margin: 5px 0;"> 
+<div style="background:rgba(179, 190, 197, 0.94); padding：10px; border-radius：5px; margin：5px 0;"> 
 <strong> 主迭代循环开始 </strong>
 </div>
 
@@ -158,14 +154,14 @@ $
    - 目标：根据当前值函数 $v_{\pi_k}$ 改进策略
    - 对于每个状态 $s \in S$：
      - 对于每个动作 $a \in A(s)$，计算动作值函数：$q_{\pi_k}(s,a) = \sum_r p(r|s,a)r + \gamma \sum_{s'} p(s'|s,a) v_{\pi_k}(s')$
-     - 选择贪婪动作： $a_k^*(s) = \arg\max_{a \in A(s)} q_{\pi_k}(s,a)$
-     - 更新策略： $\pi_{k+1}(a|s) = 1$ 如果 $a = a_k^*(s)$，否则为0（确定性策略）
+     - 选择贪婪动作：$a_k^*(s) = \arg\max_{a \in A(s)} q_{\pi_k}(s,a)$
+     - 更新策略：$\pi_{k+1}(a|s) = 1$ 如果 $a = a_k^*(s)$，否则为0（确定性策略）
 
 3. **策略收敛检查 (Policy Convergence Check)**：
    - 如果对于所有状态 $s$，$\pi_{k+1}(·|s) = \pi_k(·|s)$（即策略不再改变），则设置 converged = True
    - 否则，迭代计数器递增：$k \leftarrow k + 1$
 
-<div style="background:rgba(179, 190, 197, 0.94); padding: 10px; border-radius: 5px; margin: 5px 0;"> 
+<div style="background:rgba(179, 190, 197, 0.94); padding：10px; border-radius：5px; margin：5px 0;"> 
 <strong>主迭代循环结束</strong>
 </div>
 </div>
@@ -173,9 +169,9 @@ $
 #### 终止与输出
 - **收敛条件**：当策略不再改变（即 $\pi_{k+1} = \pi_k$）或 $k \geq K_{max}$ 时算法终止
 - **输出结果**：
-  - **最优值函数 (Optimal Value Function)**: $v^* = v_{\pi_k}$
-  - **最优策略 (Optimal Policy)**: $\pi^* = \pi_k$
-  - **实际迭代次数**: $k$
+  - **最优值函数 (Optimal Value Function)**：$v^* = v_{\pi_k}$
+  - **最优策略 (Optimal Policy)**：$\pi^* = \pi_k$
+  - **实际迭代次数**：$k$
 - **算法保证**：
   - 由于策略改进定理，每次迭代策略都会改进，直到达到最优策略。
   - 最终得到的策略是最优策略，值函数是最优值函数。
@@ -196,9 +192,9 @@ $
   - 策略迭代通常以线性速率收敛，但由于策略空间有限，实际迭代次数很少。
 
 #### 关键性质
-- **单调改进 (Monotonic Improvement)**: 每次策略改进都会产生一个更好的策略，即 $v_{\pi_{k+1}} \geq v_{\pi_k}$（逐点成立）
-- **有限收敛 (Finite Convergence)**: 由于策略数量有限，算法在有限步内收敛。
-- **最优性条件 (Optimality Condition)**: 收敛时满足贝尔曼最优方程。
+- **单调改进 (Monotonic Improvement)**：每次策略改进都会产生一个更好的策略，即 $v_{\pi_{k+1}} \geq v_{\pi_k}$（逐点成立）
+- **有限收敛 (Finite Convergence)**：由于策略数量有限，算法在有限步内收敛。
+- **最优性条件 (Optimality Condition)**：收敛时满足贝尔曼最优方程。
 
 #### 优缺点分析
 **优点**：
@@ -221,59 +217,59 @@ $
 #### 算法伪代码
 
 ```python
-算法 4.2: 策略迭代算法 (Policy Iteration Algorithm)
-输入: S, A, P, R, γ, ε, π₀, K_max
-输出: v*, π*, k
-1:  k ← 0
-2:  π₀ ← 初始策略
-3:  repeat
-4:      # 策略评估
-5:      v ← 任意初始值函数（如全零）
-6:      repeat
-7:          Δ ← 0
-8:          for each s ∈ S do
-9:              v_old ← v(s)
-10:             v_new ← 0
-11:             for each a ∈ A(s) do
-12:                 q ← 0
-13:                 for each s′ ∈ S do
-14:                     q ← q + P(s′|s,a) × [R(s,a,s′) + γ × v(s′)]
-15:                 end for
-16:                 v_new ← v_new + πₖ(a|s) × q
-17:             end for
-18:             v(s) ← v_new
-19:             Δ ← max(Δ, |v_old - v_new|)
-20:         end for
-21:      until Δ < ε
-22:      v_πₖ ← v   # 当前策略的值函数
+算法 4.2：策略迭代算法 (Policy Iteration Algorithm)
+输入：S, A, P, R, γ, ε, π₀, K_max
+输出：v*, π*, k
+1： k ← 0
+2： π₀ ← 初始策略
+3： repeat
+4：     # 策略评估
+5：     v ← 任意初始值函数（如全零）
+6：     repeat
+7：         Δ ← 0
+8：         for each s ∈ S do
+9：             v_old ← v(s)
+10：            v_new ← 0
+11：            for each a ∈ A(s) do
+12：                q ← 0
+13：                for each s′ ∈ S do
+14：                    q ← q + P(s′|s,a) × [R(s,a,s′) + γ × v(s′)]
+15：                end for
+16：                v_new ← v_new + πₖ(a|s) × q
+17：            end for
+18：            v(s) ← v_new
+19：            Δ ← max(Δ, |v_old - v_new|)
+20：        end for
+21：     until Δ < ε
+22：     v_πₖ ← v   # 当前策略的值函数
 23:
-24:      # 策略改进
-25:      πₖ₊₁ ← 空策略
-26:      for each s ∈ S do
-27:          best_a ← null
-28:          max_q ← -∞
-29:          for each a ∈ A(s) do
-30:              q ← 0
-31:              for each s′ ∈ S do
-32:                  q ← q + P(s′|s,a) × [R(s,a,s′) + γ × v_πₖ(s′)]
-33:              end for
-34:              if q > max_q then
-35:                  max_q ← q
-36:                  best_a ← a
-37:              end if
-38:          end for
-39:          πₖ₊₁(s) ← best_a  # 确定性策略，即πₖ₊₁(a|s)=1当a=best_a，否则0
-40:      end for
+24：     # 策略改进
+25：     πₖ₊₁ ← 空策略
+26：     for each s ∈ S do
+27：         best_a ← null
+28：         max_q ← -∞
+29：         for each a ∈ A(s) do
+30：             q ← 0
+31：             for each s′ ∈ S do
+32：                 q ← q + P(s′|s,a) × [R(s,a,s′) + γ × v_πₖ(s′)]
+33：             end for
+34：             if q > max_q then
+35：                 max_q ← q
+36：                 best_a ← a
+37：             end if
+38：         end for
+39：         πₖ₊₁(s) ← best_a  # 确定性策略，即πₖ₊₁(a|s)=1当a=best_a，否则0
+40：     end for
 41:
-42:      # 检查策略是否稳定
-43:      if πₖ₊₁ == πₖ then
-44:          converged ← True
-45:      else
-46:          k ← k + 1
-47:          πₖ ← πₖ₊₁
-48:      end if
-49:  until converged or k ≥ K_max
-50:  return (v_πₖ, πₖ, k)
+42：     # 检查策略是否稳定
+43：     if πₖ₊₁ == πₖ then
+44：         converged ← True
+45：     else
+46：         k ← k + 1
+47：         πₖ ← πₖ₊₁
+48：     end if
+49： until converged or k ≥ K_max
+50： return (v_πₖ, πₖ, k)
 ```
 
 注意：在策略评估中，我们使用了迭代法求解贝尔曼期望方程。实际上，对于小型问题，也可以直接解线性方程组，但迭代法更通用。
@@ -296,7 +292,7 @@ $
     - 找到最优策略 $\pi^*$ (Optimal Policy)
     - 解决序列决策问题中的长期累积奖励最大化问题
 
-- **数学表达**: 
+- **数学表达**：
 $v^*(s) = \max\limits_{a \in A} \left[ \sum\limits_{r} p(r\|s,a)r + \gamma \sum\limits_{s'} p(s'\|s,a)v^*(s') \right]$
 
 #### 算法原理
@@ -309,34 +305,34 @@ $v^*(s) = \max_{\pi\in\Pi} \sum_{a \in A(s)}\pi_k(a|s)\left[ \sum\limits_{r} p(r
 
 - **策略改进定理**：每次迭代都会产生不劣于前一次迭代的策略。
 
-- **备份操作** (Backup Operation): 每个状态的值通过考虑所有可能动作的期望回报来更新。
+- **备份操作** (Backup Operation)：每个状态的值通过考虑所有可能动作的期望回报来更新。
 
-- **异步收敛** (Asynchronous Convergence): 即使值函数更新顺序任意，算法仍能保证收敛。
+- **异步收敛** (Asynchronous Convergence)：即使值函数更新顺序任意，算法仍能保证收敛。
 
 #### 输入参数
-- **状态空间 (State Space)**: $S$ - 所有可能状态的集合
-- **动作空间 (Action Space)**: $A(s)$ - 在状态 $s$ 下可用的动作集合
-- **状态转移概率 (State Transition Probabilities)**: $p(s'\|s,a)$ - 从状态 $s$ 执行动作 $a$ 后转移到状态 $s'$ 的概率
-- **奖励概率 (Reward Probabilities)**: $p(r\|s,a)$ - 在状态 $s$ 执行动作 $a$ 获得奖励 $r$ 的概率
-- **折扣因子 (Discount Factor)**: $\gamma \in [0, 1]$ - 未来奖励的折扣系数，$\gamma = 0$ 表示只考虑即时奖励，$\gamma = 1$ 表示平等对待所有未来奖励
-- **收敛阈值 (Convergence Threshold)**: $\epsilon > 0$ - 值函数收敛的判断标准，通常取较小的正数（如 $10^{-6}$）
-- **初始值函数估计 (Initial Value Function Estimate)**: $v_0(s)$ - 对每个状态 $s \in S$ 的初始价值估计，可以设为0或随机值
+- **状态空间 (State Space)**：$S$ - 所有可能状态的集合
+- **动作空间 (Action Space)**：$A(s)$ - 在状态 $s$ 下可用的动作集合
+- **状态转移概率 (State Transition Probabilities)**：$p(s'\|s,a)$ - 从状态 $s$ 执行动作 $a$ 后转移到状态 $s'$ 的概率
+- **奖励概率 (Reward Probabilities)**：$p(r\|s,a)$ - 在状态 $s$ 执行动作 $a$ 获得奖励 $r$ 的概率
+- **折扣因子 (Discount Factor)**：$\gamma \in [0, 1]$ - 未来奖励的折扣系数，$\gamma = 0$ 表示只考虑即时奖励，$\gamma = 1$ 表示平等对待所有未来奖励
+- **收敛阈值 (Convergence Threshold)**：$\epsilon > 0$ - 值函数收敛的判断标准，通常取较小的正数（如 $10^{-6}$）
+- **初始值函数估计 (Initial Value Function Estimate)**：$v_0(s)$ - 对每个状态 $s \in S$ 的初始价值估计，可以设为0或随机值
 - **最大迭代次数** $K_{max}$（防止无限循环的保险措施）
 
 #### 初始化阶段
-- **设置迭代计数器**： $k = 0$
+- **设置迭代计数器**：$k = 0$
 - **初始化值函数**：
   $v_0(s)$ 对所有状态 $s \in S$
   - 常见初始化方法：全零初始化、随机初始化、基于启发式的初始化
-- **初始化策略**： $\pi_0$ 
+- **初始化策略**：$\pi_0$ 
   - 可以是任意策略或基于初始值函数的贪婪策略
   - 初始策略对最终结果无影响，但可能影响收敛速度
 - **设置收敛标志**：converged = False
 
 #### 算法流程
-<div style="background-color: #f0f0f0; padding: 10px; border-radius: 5px;">
+<div style="background-color：#f0f0f0; padding：10px; border-radius：5px;">
 
-<div style="background:rgba(179, 190, 197, 0.94); padding: 10px; border-radius: 5px; margin: 5px 0;"> 
+<div style="background:rgba(179, 190, 197, 0.94); padding：10px; border-radius：5px; margin：5px 0;"> 
 <strong> 主迭代循环开始 </strong>
 </div>
 
@@ -382,7 +378,7 @@ $ \Delta = \max_{s \in S} \|v_{k+1}(s) - v_k(s)\| $
    - 如果 $\Delta<\epsilon$，则设置 converged = True
    - 迭代计数器递增：$k\leftarrow{k + 1}$
 
-<div style="background:rgba(179, 190, 197, 0.94); padding: 10px; border-radius: 5px; margin: 5px 0;"> 
+<div style="background:rgba(179, 190, 197, 0.94); padding：10px; border-radius：5px; margin：5px 0;"> 
 <strong>主迭代循环结束</strong>
 </div>
 </div>
@@ -390,9 +386,9 @@ $ \Delta = \max_{s \in S} \|v_{k+1}(s) - v_k(s)\| $
 #### 终止与输出
 - **收敛条件**：当 $\Delta < \epsilon$ 或 $k \geq K_{max}$ 时算法终止
 - **输出结果**：
-  - **最优值函数 (Optimal Value Function)**: $v^* = v_k$
-  - **最优策略 (Optimal Policy)**: $\pi^* = \pi_k$
-  - **实际迭代次数**: $k$
+  - **最优值函数 (Optimal Value Function)**：$v^* = v_k$
+  - **最优策略 (Optimal Policy)**：$\pi^* = \pi_k$
+  - **实际迭代次数**：$k$
 - **算法保证**：
   - $v^*$ 满足贝尔曼最优方程
   - $\pi^*$ 是相对于初始状态分布的最优策略
@@ -413,15 +409,15 @@ $ \Delta = \max_{s \in S} \|v_{k+1}(s) - v_k(s)\| $
   - $O(\|S\|)$ 存储策略
 
 - **收敛速率 (Convergence Rate)**： 
-  - 线性收敛： $\|v_{k+1} - v^*\|_\infty \leq \gamma \|v_k - v^*\|_\infty$
-  - 误差界限： $\|v_k - v^*\|_\infty \leq \frac{\gamma^k}{1-\gamma} \|v_1 - v_0\|_\infty$
+  - 线性收敛：$\|v_{k+1} - v^*\|_\infty \leq \gamma \|v_k - v^*\|_\infty$
+  - 误差界限：$\|v_k - v^*\|_\infty \leq \frac{\gamma^k}{1-\gamma} \|v_1 - v_0\|_\infty$
 
 #### 关键性质
-- **单调改进 (Monotonic Improvement)**: $v_{k+1}(s) \geq v_k(s)$ 对所有 $s \in S$
-- **压缩映射 (Contraction Mapping)**: 贝尔曼最优算子是模为 $\gamma$ 的压缩映射
-- **最优性条件 (Optimality Condition)**: 收敛时满足贝尔曼最优方程
-- **策略收敛 (Policy Convergence)**: 最优策略可能在值函数收敛之前就已稳定
-- **异步收敛 (Asynchronous Convergence)**: 支持异步更新，但同步更新保证收敛
+- **单调改进 (Monotonic Improvement)**：$v_{k+1}(s) \geq v_k(s)$ 对所有 $s \in S$
+- **压缩映射 (Contraction Mapping)**：贝尔曼最优算子是模为 $\gamma$ 的压缩映射
+- **最优性条件 (Optimality Condition)**：收敛时满足贝尔曼最优方程
+- **策略收敛 (Policy Convergence)**：最优策略可能在值函数收敛之前就已稳定
+- **异步收敛 (Asynchronous Convergence)**：支持异步更新，但同步更新保证收敛
 - **无需策略评估**：与策略迭代不同，值迭代不需要完整的策略评估步骤
 
 #### 优缺点分析
@@ -447,35 +443,35 @@ $ \Delta = \max_{s \in S} \|v_{k+1}(s) - v_k(s)\| $
 #### 算法伪代码
 
 ```python
-算法 4.1: 值迭代算法 (Value Iteration Algorithm)
-输入: S, A, P, R, γ, ε, v₀, K_max
-输出: v*, π*, k
-1:  k ← 0
-2:  for each s ∈ S do v₀(s) ← 初始值
-3:  π₀ ← 任意初始策略
-4:  repeat
-5:      Δ ← 0
-6:      for each s ∈ S do
-7:          v_old ← vₖ(s)
-8:          max_q ← -∞
-9:          best_a ← null
-10:         for each a ∈ A(s) do
-11:             q ← 0
-12:             for each s′ ∈ S do
-13:                 q ← q + P(s′|s,a) × [R(s,a,s′) + γ × vₖ(s′)]
-14:             end for
-15:             if q > max_q then
-16:                 max_q ← q
-17:                 best_a ← a
-18:             end if
-19:         end for
-20:         vₖ₊₁(s) ← max_q
-21:         πₖ₊₁(s) ← best_a  # 确定性策略
-22:         Δ ← max(Δ, |vₖ₊₁(s) - v_old|)
-23:     end for
-24:     k ← k + 1
-25:  until Δ < ε or k ≥ K_max
-26:  return (vₖ, πₖ, k)
+算法 4.1：值迭代算法 (Value Iteration Algorithm)
+输入：S, A, P, R, γ, ε, v₀, K_max
+输出：v*, π*, k
+1： k ← 0
+2： for each s ∈ S do v₀(s) ← 初始值
+3： π₀ ← 任意初始策略
+4： repeat
+5：     Δ ← 0
+6：     for each s ∈ S do
+7：         v_old ← vₖ(s)
+8：         max_q ← -∞
+9：         best_a ← null
+10：        for each a ∈ A(s) do
+11：            q ← 0
+12：            for each s′ ∈ S do
+13：                q ← q + P(s′|s,a) × [R(s,a,s′) + γ × vₖ(s′)]
+14：            end for
+15：            if q > max_q then
+16：                max_q ← q
+17：                best_a ← a
+18：            end if
+19：        end for
+20：        vₖ₊₁(s) ← max_q
+21：        πₖ₊₁(s) ← best_a  # 确定性策略
+22：        Δ ← max(Δ, |vₖ₊₁(s) - v_old|)
+23：    end for
+24：    k ← k + 1
+25： until Δ < ε or k ≥ K_max
+26： return (vₖ, πₖ, k)
 ```
 
 </details>
