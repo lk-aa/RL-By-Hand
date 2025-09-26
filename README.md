@@ -158,7 +158,7 @@ v^{(j+1)}_{\pi_k}(s) = \sum_a \pi_k(a|s) \left[ \sum_r p(r|s,a)r + \gamma \sum_{
      - 更新策略： $\pi_{k+1}(a|s) = 1$ 如果 $a = a_k^*(s)$，否则为0（确定性策略）
 
 3. **策略收敛检查 (Policy Convergence Check)**：
-   - 如果对于所有状态 $s$，$\pi_{k+1}(\cdot|s) = \pi_k(\cdot|s)$（即策略不再改变），则设置 converged = True
+   - 如果对于所有状态 $s$， $\pi_{k+1}(\cdot | s) = \pi_k(\cdot | s)$ （即策略不再改变），则设置 converged = True
    - 否则，迭代计数器递增： $k \leftarrow k + 1$
 
 <div style="background:rgba(179, 190, 197, 0.94); padding：10px; border-radius：5px; margin：5px 0;"> 
@@ -340,7 +340,7 @@ $`v^*(s) = \max_{\pi\in\Pi} \sum_{a \in A(s)}\pi_k(a|s)\left[ \sum\limits_{r} p(
    当 $`|v_k-v_{k-1}|_\infty>\epsilon`$ 且 $`k<K_{max}`$ 时继续迭代
    - 使用无穷范数确保所有状态的值函数变化都小于阈值
 
-2. **状态遍历 (State Iteration)**：对每个状态 $s \in S$ 执行以下操作：
+2. **状态遍历 (State Iteration)**：对每个状态 $s \in S$ 执行以下操作：  
    **注释**：状态遍历顺序不影响收敛性，但可能影响收敛速度
    
    - **动作评估 (Action Evaluation)**：对每个动作 $a \in A(s)$ 计算：
@@ -393,7 +393,7 @@ $`\Delta = \max_{s \in S} \|v_{k+1}(s) - v_k(s)\|`$
   - $v^*$ 满足贝尔曼最优方程
   - $\pi^*$ 是相对于初始状态分布的最优策略
   - 对于充分小的 $\epsilon$，得到的策略是 $\epsilon$-最优的
-  - 误差界限： $\|v_k - v^*\|_\infty \leq \frac{\gamma^k}{1-\gamma} \|v_1 - v_0\|_\infty$
+  - 误差界限： $|v_k - v^*|_\infty \leq \frac{\gamma^k}{1-\gamma} |v_1 - v_0|_\infty$
 - **验证方法**：可以通过策略评估验证所得策略的性能
 
 #### 算法复杂度分析
@@ -409,8 +409,8 @@ $`\Delta = \max_{s \in S} \|v_{k+1}(s) - v_k(s)\|`$
   - $O(\|S\|)$ 存储策略
 
 - **收敛速率 (Convergence Rate)**： 
-  - 线性收敛：$\|v_{k+1} - v^*\|_\infty \leq \gamma \|v_k - v^*\|_\infty$
-  - 误差界限：$\|v_k - v^*\|_\infty \leq \frac{\gamma^k}{1-\gamma} \|v_1 - v_0\|_\infty$
+  - 线性收敛： $\|v_{k+1} - v^*\|_\infty \leq \gamma \|v_k - v^*\|_\infty$
+  - 误差界限： $\|v_k - v^*\|_\infty \leq \frac{\gamma^k}{1-\gamma} \|v_1 - v_0\|_\infty$
 
 #### 关键性质
 - **单调改进 (Monotonic Improvement)**： $v_{k+1}(s) \geq v_k(s)$ 对所有 $s \in S$
