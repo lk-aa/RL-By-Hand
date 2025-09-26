@@ -118,19 +118,19 @@ solver.env.render()
 - **策略改进步骤**：利用当前值函数，对每个状态选择贪婪动作，形成新策略。
 
 #### 输入参数
-- **状态空间 (State Space)**：$S$ - 所有可能状态的集合
-- **动作空间 (Action Space)**：$A(s)$ - 在状态 $s$ 下可用的动作集合
-- **状态转移概率 (State Transition Probabilities)**：$p(s'|s,a)$ - 从状态 $s$ 执行动作 $a$ 后转移到状态 $s'$ 的概率
-- **奖励概率 (Reward Probabilities)**：$p(r|s,a)$ - 在状态 $s$ 执行动作 $a$ 获得奖励 $r$ 的概率
-- **折扣因子 (Discount Factor)**：$\gamma \in [0, 1]$ - 未来奖励的折扣系数
-- **策略评估收敛阈值 (Policy Evaluation Convergence Threshold)**：$\epsilon$ - 用于判断策略评估步骤中值函数收敛的标准
-- **初始策略 (Initial Policy)**：$\pi_0$ - 策略迭代的起始策略
+- **状态空间 (State Space)**：所有可能状态的集合 $S$
+- **动作空间 (Action Space)**： 在状态 $s$ 下可用的动作集合 $A(s)$
+- **状态转移概率 (State Transition Probabilities)**：从状态 $s$ 执行动作 $a$ 后转移到状态 $s'$ 的概率 $p(s'|s,a)$ 
+- **奖励概率 (Reward Probabilities)**：在状态 $s$ 执行动作 $a$ 获得奖励 $r$ 的概率 $p(r|s,a)$
+- **折扣因子 (Discount Factor)**：未来奖励的折扣系数 $\gamma \in [0, 1]$
+- **策略评估收敛阈值 (Policy Evaluation Convergence Threshold)**：用于判断策略评估步骤中值函数收敛的标准 $\epsilon$
+- **初始策略 (Initial Policy)**：策略迭代的起始策略 $\pi_0$
 - **最大迭代次数** $K_{max}$（防止无限循环的保险措施）
 
 #### 初始化阶段
-- **设置迭代计数器**：$k = 0$
-- **初始化策略**：$\pi_0$ 可以是任意策略，通常选择随机策略或贪婪策略（如果有先验知识）
-- **设置收敛标志**：converged = False
+- **设置迭代计数器**：表示为 $k = 0$
+- **初始化策略**：表示为 $\pi_0$，可以是任意策略，通常选择随机策略或贪婪策略（如果有先验知识）
+- **设置收敛标志**：表示为 converged = False
 
 #### 算法流程
 
@@ -145,9 +145,9 @@ solver.env.render()
    - 初始化：设置 $v^{(0)}_{\pi_k}$ 为任意值（例如全零）
    - 迭代：使用贝尔曼期望方程进行迭代，直到值函数收敛（变化小于阈值 $\epsilon$）
      - 对于每个状态 $s \in S$：
-$
+$`
 v^{(j+1)}_{\pi_k}(s) = \sum_a \pi_k(a|s) \left[ \sum_r p(r|s,a)r + \gamma \sum_{s'} p(s'|s,a) v^{(j)}_{\pi_k}(s') \right]
-$
+`$
    - 输出：收敛的值函数 $v_{\pi_k}$
 
 2. **策略改进 (Policy Improvement)**：
@@ -293,11 +293,11 @@ $
     - 解决序列决策问题中的长期累积奖励最大化问题
 
 - **数学表达**：
-$v^*(s) = \max\limits_{a \in A} \left[ \sum\limits_{r} p(r\|s,a)r + \gamma \sum\limits_{s'} p(s'\|s,a)v^*(s') \right]$
+$`v^*(s) = \max\limits_{a \in A} \left[ \sum\limits_{r} p(r\|s,a)r + \gamma \sum\limits_{s'} p(s'\|s,a)v^*(s') \right]`$
 
 #### 算法原理
 - **数学基础**：基于贝尔曼最优方程 (Bellman Optimality Equation)：
-$v^*(s) = \max_{\pi\in\Pi} \sum_{a \in A(s)}\pi_k(a|s)\left[ \sum\limits_{r} p(r\|s,a)r + \gamma \sum\limits_{s'} p(s'\|s,a)v^*(s') \right]$
+$`v^*(s) = \max_{\pi\in\Pi} \sum_{a \in A(s)}\pi_k(a|s)\left[ \sum\limits_{r} p(r\|s,a)r + \gamma \sum\limits_{s'} p(s'\|s,a)v^*(s') \right]`$
 
 - **核心思想**：通过迭代方式逐步改进值函数估计，直至收敛到最优值函数。
 
@@ -310,24 +310,24 @@ $v^*(s) = \max_{\pi\in\Pi} \sum_{a \in A(s)}\pi_k(a|s)\left[ \sum\limits_{r} p(r
 - **异步收敛** (Asynchronous Convergence)：即使值函数更新顺序任意，算法仍能保证收敛。
 
 #### 输入参数
-- **状态空间 (State Space)**：$S$ - 所有可能状态的集合
-- **动作空间 (Action Space)**：$A(s)$ - 在状态 $s$ 下可用的动作集合
-- **状态转移概率 (State Transition Probabilities)**：$p(s'\|s,a)$ - 从状态 $s$ 执行动作 $a$ 后转移到状态 $s'$ 的概率
-- **奖励概率 (Reward Probabilities)**：$p(r\|s,a)$ - 在状态 $s$ 执行动作 $a$ 获得奖励 $r$ 的概率
-- **折扣因子 (Discount Factor)**：$\gamma \in [0, 1]$ - 未来奖励的折扣系数，$\gamma = 0$ 表示只考虑即时奖励，$\gamma = 1$ 表示平等对待所有未来奖励
-- **收敛阈值 (Convergence Threshold)**：$\epsilon > 0$ - 值函数收敛的判断标准，通常取较小的正数（如 $10^{-6}$）
-- **初始值函数估计 (Initial Value Function Estimate)**：$v_0(s)$ - 对每个状态 $s \in S$ 的初始价值估计，可以设为0或随机值
+- **状态空间 (State Space)**：所有可能状态的集合 $S$
+- **动作空间 (Action Space)**：在状态 $s$ 下可用的动作集合 $A(s)$
+- **状态转移概率 (State Transition Probabilities)**：从状态 $s$ 执行动作 $a$ 后转移到状态 $s'$ 的概率 $p(s'\|s,a)$
+- **奖励概率 (Reward Probabilities)**：在状态 $s$ 执行动作 $a$ 获得奖励 $r$ 的概率 $p(r\|s,a)$
+- **折扣因子 (Discount Factor)**：未来奖励的折扣系数 $\gamma \in [0, 1]$，$\gamma = 0$ 表示只考虑即时奖励，$\gamma = 1$ 表示平等对待所有未来奖励
+- **收敛阈值 (Convergence Threshold)**：值函数收敛的判断标准 $\epsilon > 0$，通常取较小的正数（如 $10^{-6}$）
+- **初始值函数估计 (Initial Value Function Estimate)**：对每个状态 $s \in S$ 的初始价值估计 $v_0(s)$，可以设为0或随机值
 - **最大迭代次数** $K_{max}$（防止无限循环的保险措施）
 
 #### 初始化阶段
-- **设置迭代计数器**：$k = 0$
+- **设置迭代计数器**：表示为 $k = 0$
 - **初始化值函数**：
   $v_0(s)$ 对所有状态 $s \in S$
   - 常见初始化方法：全零初始化、随机初始化、基于启发式的初始化
-- **初始化策略**：$\pi_0$ 
+- **初始化策略**：表示为 $\pi_0$ 
   - 可以是任意策略或基于初始值函数的贪婪策略
   - 初始策略对最终结果无影响，但可能影响收敛速度
-- **设置收敛标志**：converged = False
+- **设置收敛标志**：表示为 converged = False
 
 #### 算法流程
 <div style="background-color：#f0f0f0; padding：10px; border-radius：5px;">
@@ -345,18 +345,18 @@ $v^*(s) = \max_{\pi\in\Pi} \sum_{a \in A(s)}\pi_k(a|s)\left[ \sum\limits_{r} p(r
    
    - **动作评估 (Action Evaluation)**：对每个动作 $a \in A(s)$ 计算：
      - **期望即时奖励**：
-$ \mathbb{E}[r\|s,a] = \sum_r p(r\|s,a) \cdot r $
+$`\mathbb{E}[r\|s,a] = \sum_r p(r\|s,a) \cdot r`$
        - 计算在当前状态执行特定动作的期望即时奖励
      - **期望未来价值**：
-$ \mathbb{E}[v_k(s')\|s,a] = \sum_{s'} p(s'\|s,a) \cdot v_k(s') $
+$`\mathbb{E}[v_k(s')\|s,a] = \sum_{s'} p(s'\|s,a) \cdot v_k(s')`$
        - 计算在当前状态执行特定动作后的期望未来累积奖励
      - **Q值计算 (Q-value Calculation)**：
-$ q_k(s,a) = \mathbb{E}[r\|s,a] + \gamma \cdot \mathbb{E}[v_k(s')\|s,a] $
+$`q_k(s,a) = \mathbb{E}[r\|s,a] + \gamma \cdot \mathbb{E}[v_k(s')\|s,a]`$
        - 综合即时奖励和未来价值的全面评估
    
    - **最优动作选择 (Optimal Action Selection)**：
      - 找到使Q值最大化的动作：
-$ a_k^*(s) = \arg\max_{a \in A(s)} q_k(s,a) $
+$`a_k^*(s) = \arg\max_{a \in A(s)} q_k(s,a)`$
      - **平局处理策略**：如果多个动作产生相同的最大值：
        - 随机选择一个
        - 选择索引最小的动作
@@ -364,17 +364,17 @@ $ a_k^*(s) = \arg\max_{a \in A(s)} q_k(s,a) $
    
    - **策略更新 (Policy Update)**：
      - 为状态 $s$ 设置确定性策略：
-$ \pi_{k+1}(a\|s) = \begin{cases} 1 & \text{若 } a = a_k^*(s) \\ 0 & \text{否则} \end{cases} $
+$`\pi_{k+1}(a\|s) = \begin{cases} 1 & \text{若 } a = a_k^*(s) \\ 0 & \text{否则} \end{cases}`$
      - 策略是确定性的，每个状态对应一个最优动作
    
    - **值函数更新 (Value Function Update)**：
      - 使用最大Q值更新状态值：
-$ v_{k+1}(s) = \max_{a \in A(s)} q_k(s,a) = q_k(s, a_k^*(s)) $
+$`v_{k+1}(s) = \max_{a \in A(s)} q_k(s,a) = q_k(s, a_k^*(s))`$
      - 这相当于执行一次贝尔曼最优算子
 
 3. **全局收敛检查 (Global Convergence Check)**：
    - 计算值函数最大变化量：
-$ \Delta = \max_{s \in S} \|v_{k+1}(s) - v_k(s)\| $
+$`\Delta = \max_{s \in S} \|v_{k+1}(s) - v_k(s)\|`$
    - 如果 $\Delta<\epsilon$，则设置 converged = True
    - 迭代计数器递增：$k\leftarrow{k + 1}$
 
@@ -386,9 +386,9 @@ $ \Delta = \max_{s \in S} \|v_{k+1}(s) - v_k(s)\| $
 #### 终止与输出
 - **收敛条件**：当 $\Delta < \epsilon$ 或 $k \geq K_{max}$ 时算法终止
 - **输出结果**：
-  - **最优值函数 (Optimal Value Function)**：$v^* = v_k$
-  - **最优策略 (Optimal Policy)**：$\pi^* = \pi_k$
-  - **实际迭代次数**：$k$
+  - **最优值函数 (Optimal Value Function)**： $v^* = v_k$
+  - **最优策略 (Optimal Policy)**： $\pi^* = \pi_k$
+  - **实际迭代次数**： $k$
 - **算法保证**：
   - $v^*$ 满足贝尔曼最优方程
   - $\pi^*$ 是相对于初始状态分布的最优策略
