@@ -99,8 +99,8 @@ solver.env.render()
 
 #### 算法目标
 - **求解贝尔曼最优方程 (Bellman Optimality Equation)**
-    - 找到最优状态值函数 $ v^* $ (Optimal State-Value Function)
-    - 找到最优策略 $ \pi^* $ (Optimal Policy)
+    - 找到最优状态值函数 $v^*$ (Optimal State-Value Function)
+    - 找到最优策略 $\pi^*$ (Optimal Policy)
     - 解决序列决策问题中的长期累积奖励最大化问题
 
 - **数学表达**: 
@@ -111,7 +111,7 @@ solver.env.render()
 #### 算法原理
 - **数学基础**：基于策略评估和策略改进定理。
   - **策略评估**：对于固定策略π，通过迭代求解贝尔曼方程得到该策略的状态值函数v_π。
-  - **策略改进**：根据v_π，通过选择每个状态下的最优动作来改进策略。
+  - **策略改进**：根据$v_π$，通过选择每个状态下的最优动作来改进策略。
 
 - **核心思想**：通过交替执行策略评估和策略改进，逐步提升策略的质量，直至策略不再改变。
 
@@ -122,14 +122,14 @@ solver.env.render()
 - **策略改进步骤**：利用当前值函数，对每个状态选择贪婪动作，形成新策略。
 
 #### 输入参数
-- **状态空间 (State Space)**: $ S $ - 所有可能状态的集合
-- **动作空间 (Action Space)**: $ A(s) $ - 在状态 $ s $ 下可用的动作集合
-- **状态转移概率 (State Transition Probabilities)**: $ p(s'|s,a) $ - 从状态 $ s $ 执行动作 $ a $ 后转移到状态 $ s' $ 的概率
-- **奖励概率 (Reward Probabilities)**: $ p(r|s,a) $ - 在状态 $ s $ 执行动作 $ a $ 获得奖励 $ r $ 的概率
-- **折扣因子 (Discount Factor)**: $ \gamma \in [0, 1] $ - 未来奖励的折扣系数
-- **策略评估收敛阈值 (Policy Evaluation Convergence Threshold)**: $ \epsilon $ - 用于判断策略评估步骤中值函数收敛的标准
-- **初始策略 (Initial Policy)**: $ \pi_0 $ - 策略迭代的起始策略
-- **最大迭代次数** $ K_{max} $（防止无限循环的保险措施）
+- **状态空间 (State Space)**: $S$ - 所有可能状态的集合
+- **动作空间 (Action Space)**: $A(s)$ - 在状态 $s$ 下可用的动作集合
+- **状态转移概率 (State Transition Probabilities)**: $p(s'|s,a)$ - 从状态 $s$ 执行动作 $a$ 后转移到状态 $s'$ 的概率
+- **奖励概率 (Reward Probabilities)**: $p(r|s,a)$ - 在状态 $s$ 执行动作 $a$ 获得奖励 $r$ 的概率
+- **折扣因子 (Discount Factor)**: $\gamma \in [0, 1]$ - 未来奖励的折扣系数
+- **策略评估收敛阈值 (Policy Evaluation Convergence Threshold)**: $\epsilon$ - 用于判断策略评估步骤中值函数收敛的标准
+- **初始策略 (Initial Policy)**: $\pi_0$ - 策略迭代的起始策略
+- **最大迭代次数** $K_{max}$（防止无限循环的保险措施）
 
 #### 初始化阶段
 - **设置迭代计数器**：$ k = 0 $
