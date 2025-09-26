@@ -393,7 +393,7 @@ $`\Delta = \max_{s \in S} \|v_{k+1}(s) - v_k(s)\|`$
   - $v^*$ 满足贝尔曼最优方程
   - $\pi^*$ 是相对于初始状态分布的最优策略
   - 对于充分小的 $\epsilon$，得到的策略是 $\epsilon$-最优的
-  - 误差界限： 满足 $|v_k - v^*|_{\infty} \leq \frac{\gamma^k}{1-\gamma} |v_1 - v_0|_{\infty}$
+  - 误差界限： 满足 $`|v_k - v^*|_{\infty} \leq \frac{\gamma^k}{1-\gamma} |v_1 - v_0|_{\infty}`$
 - **验证方法**：可以通过策略评估验证所得策略的性能
 
 #### 算法复杂度分析
@@ -409,8 +409,8 @@ $`\Delta = \max_{s \in S} \|v_{k+1}(s) - v_k(s)\|`$
   - $O(\|S\|)$ 存储策略
 
 - **收敛速率 (Convergence Rate)**： 
-  - 线性收敛： 满足 $|v_{k+1} - v^*|_{\infty} \leq \gamma |v_k - v^*|_{\infty}$
-  - 误差界限： 满足 $|v_k - v^*|_{\infty} \leq \frac{\gamma^k}{1-\gamma} |v_1 - v_0|_{\infty}$
+  - 线性收敛： 满足 $`|v_{k+1} - v^*|_{\infty} \leq \gamma |v_k - v^*|_{\infty}`$
+  - 误差界限： 满足 $`|v_k - v^*|_{\infty} \leq \frac{\gamma^k}{1-\gamma} |v_1 - v_0|_{\infty}`$
 
 #### 关键性质
 - **单调改进 (Monotonic Improvement)**： $v_{k+1}(s) \geq v_k(s)$ 对所有 $s \in S$
