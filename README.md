@@ -153,13 +153,13 @@ v^{(j+1)}_{\pi_k}(s) = \sum_a \pi_k(a|s) \left[ \sum_r p(r|s,a)r + \gamma \sum_{
 2. **策略改进 (Policy Improvement)**：
    - 目标：根据当前值函数 $v_{\pi_k}$ 改进策略
    - 对于每个状态 $s \in S$：
-     - 对于每个动作 $a \in A(s)$，计算动作值函数：$q_{\pi_k}(s,a) = \sum_r p(r|s,a)r + \gamma \sum_{s'} p(s'|s,a) v_{\pi_k}(s')$
-     - 选择贪婪动作：$a_k^*(s) = \arg\max_{a \in A(s)} q_{\pi_k}(s,a)$
-     - 更新策略：$\pi_{k+1}(a|s) = 1$ 如果 $a = a_k^*(s)$，否则为0（确定性策略）
+     - 对于每个动作 $a \in A(s)$，计算动作值函数： $q_{\pi_k}(s,a) = \sum_r p(r|s,a)r + \gamma \sum_{s'} p(s'|s,a) v_{\pi_k}(s')$
+     - 选择贪婪动作： $a_k^*(s) = \arg\max_{a \in A(s)} q_{\pi_k}(s,a)$
+     - 更新策略： $\pi_{k+1}(a|s) = 1$ 如果 $a = a_k^*(s)$，否则为0（确定性策略）
 
 3. **策略收敛检查 (Policy Convergence Check)**：
    - 如果对于所有状态 $s$，$\pi_{k+1}(·|s) = \pi_k(·|s)$（即策略不再改变），则设置 converged = True
-   - 否则，迭代计数器递增：$k \leftarrow k + 1$
+   - 否则，迭代计数器递增： $k \leftarrow k + 1$
 
 <div style="background:rgba(179, 190, 197, 0.94); padding：10px; border-radius：5px; margin：5px 0;"> 
 <strong>主迭代循环结束</strong>
@@ -169,9 +169,9 @@ v^{(j+1)}_{\pi_k}(s) = \sum_a \pi_k(a|s) \left[ \sum_r p(r|s,a)r + \gamma \sum_{
 #### 终止与输出
 - **收敛条件**：当策略不再改变（即 $\pi_{k+1} = \pi_k$）或 $k \geq K_{max}$ 时算法终止
 - **输出结果**：
-  - **最优值函数 (Optimal Value Function)**：$v^* = v_{\pi_k}$
-  - **最优策略 (Optimal Policy)**：$\pi^* = \pi_k$
-  - **实际迭代次数**：$k$
+  - **最优值函数 (Optimal Value Function)**： $v^* = v_{\pi_k}$
+  - **最优策略 (Optimal Policy)**： $\pi^* = \pi_k$
+  - **实际迭代次数**： $k$
 - **算法保证**：
   - 由于策略改进定理，每次迭代策略都会改进，直到达到最优策略。
   - 最终得到的策略是最优策略，值函数是最优值函数。
@@ -314,7 +314,7 @@ $`v^*(s) = \max_{\pi\in\Pi} \sum_{a \in A(s)}\pi_k(a|s)\left[ \sum\limits_{r} p(
 - **动作空间 (Action Space)**：在状态 $s$ 下可用的动作集合 $A(s)$
 - **状态转移概率 (State Transition Probabilities)**：从状态 $s$ 执行动作 $a$ 后转移到状态 $s'$ 的概率 $p(s'\|s,a)$
 - **奖励概率 (Reward Probabilities)**：在状态 $s$ 执行动作 $a$ 获得奖励 $r$ 的概率 $p(r\|s,a)$
-- **折扣因子 (Discount Factor)**：未来奖励的折扣系数 $\gamma \in [0, 1]$，$\gamma = 0$ 表示只考虑即时奖励，$\gamma = 1$ 表示平等对待所有未来奖励
+- **折扣因子 (Discount Factor)**：未来奖励的折扣系数 $\gamma \in [0, 1]$，$`\gamma=0`$ 表示只考虑即时奖励，$`\gamma=1`$ 表示平等对待所有未来奖励
 - **收敛阈值 (Convergence Threshold)**：值函数收敛的判断标准 $\epsilon > 0$，通常取较小的正数（如 $10^{-6}$）
 - **初始值函数估计 (Initial Value Function Estimate)**：对每个状态 $s \in S$ 的初始价值估计 $v_0(s)$，可以设为0或随机值
 - **最大迭代次数** $K_{max}$（防止无限循环的保险措施）
@@ -337,7 +337,7 @@ $`v^*(s) = \max_{\pi\in\Pi} \sum_{a \in A(s)}\pi_k(a|s)\left[ \sum\limits_{r} p(
 </div>
 
 1. **收敛判断 (Convergence Check)**：
-   当 $\|v_k-v_{k-1}\|_\infty>\epsilon$ 且 $k < K_{max}$ 时继续迭代
+   当 $`|v_k-v_{k-1}|_\infty>\epsilon`$ 且 $`k<K_{max}`$ 时继续迭代
    - 使用无穷范数确保所有状态的值函数变化都小于阈值
 
 2. **状态遍历 (State Iteration)**：对每个状态 $s \in S$ 执行以下操作：
@@ -413,7 +413,7 @@ $`\Delta = \max_{s \in S} \|v_{k+1}(s) - v_k(s)\|`$
   - 误差界限：$\|v_k - v^*\|_\infty \leq \frac{\gamma^k}{1-\gamma} \|v_1 - v_0\|_\infty$
 
 #### 关键性质
-- **单调改进 (Monotonic Improvement)**：$v_{k+1}(s) \geq v_k(s)$ 对所有 $s \in S$
+- **单调改进 (Monotonic Improvement)**： $v_{k+1}(s) \geq v_k(s)$ 对所有 $s \in S$
 - **压缩映射 (Contraction Mapping)**：贝尔曼最优算子是模为 $\gamma$ 的压缩映射
 - **最优性条件 (Optimality Condition)**：收敛时满足贝尔曼最优方程
 - **策略收敛 (Policy Convergence)**：最优策略可能在值函数收敛之前就已稳定
