@@ -345,7 +345,7 @@ $`v^*(s) = \max_{\pi\in\Pi} \sum_{a \in A(s)}\pi_k(a|s)\left[ \sum\limits_{r} p(
    
    - **动作评估 (Action Evaluation)**：对每个动作 $a \in A(s)$ 计算：
      - **期望即时奖励**：  
-$`\mathbb{E}[r\|s,a] = \sum_r p(r\|s,a) \cdot r`$
+$$`\mathbb{E}[r\|s,a] = \sum_r p(r\|s,a) \cdot r`$$
        - 计算在当前状态执行特定动作的期望即时奖励
      - **期望未来价值**：  
 $`\mathbb{E}[v_k(s')\|s,a] = \sum_{s'} p(s'\|s,a) \cdot v_k(s')`$
