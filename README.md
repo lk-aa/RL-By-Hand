@@ -110,8 +110,8 @@ solver.env.render()
 
 #### 算法原理
 - **数学基础**：基于策略评估和策略改进定理。
-  - **策略评估**：对于固定策略$π$，通过迭代求解贝尔曼方程得到该策略的状态值函数$v_{\pi}$。
-  - **策略改进**：根据$v_{\pi}$，通过选择每个状态下的最优动作来改进策略。
+  - **策略评估**：对于固定策略 $\pi$，通过迭代求解贝尔曼方程得到该策略的状态值函数 $v_{\pi}$。
+  - **策略改进**：根据 $v_{\pi}$，通过选择每个状态下的最优动作来改进策略。
 
 - **核心思想**：通过交替执行策略评估和策略改进，逐步提升策略的质量，直至策略不再改变。
 
@@ -157,12 +157,9 @@ $
 2. **策略改进 (Policy Improvement)**：
    - 目标：根据当前值函数 $v_{\pi_k}$ 改进策略
    - 对于每个状态 $s \in S$：
-     - 对于每个动作 $a \in A(s)$，计算动作值函数：
-$
-q_{\pi_k}(s,a) = \sum_r p(r|s,a)r + \gamma \sum_{s'} p(s'|s,a) v_{\pi_k}(s')
-$
-     - 选择贪婪动作：$a_k^*(s) = \arg\max_{a \in A(s)} q_{\pi_k}(s,a)$
-     - 更新策略：$\pi_{k+1}(a|s) = 1$ 如果 $a = a_k^*(s)$，否则为0（确定性策略）
+     - 对于每个动作 $a \in A(s)$，计算动作值函数：$$q_{\pi_k}(s,a) = \sum_r p(r|s,a)r + \gamma \sum_{s'} p(s'|s,a) v_{\pi_k}(s')$$
+     - 选择贪婪动作： $a_k^*(s) = \arg\max_{a \in A(s)} q_{\pi_k}(s,a)$
+     - 更新策略： $\pi_{k+1}(a|s) = 1$ 如果 $a = a_k^*(s)$，否则为0（确定性策略）
 
 3. **策略收敛检查 (Policy Convergence Check)**：
    - 如果对于所有状态 $s$，$\pi_{k+1}(·|s) = \pi_k(·|s)$（即策略不再改变），则设置 converged = True
@@ -185,9 +182,9 @@ $
 
 #### 算法复杂度分析
 - **时间复杂度 (Time Complexity)**： 
-  - 每次策略评估：$O(|S|^2 \times |A|)$ 每次迭代，策略评估需要多次迭代（记作$J$），所以一次策略评估步骤为 $O(J \times |S|^2 \times |A|)$
-  - 策略改进：$O(|S|^2 \times |A|)$
-  - 总复杂度：$O(K \times (J \times |S|^2 \times |A| + |S|^2 \times |A|))$，其中 $K$ 是策略迭代次数，$J$ 是策略评估的迭代次数。
+  - 每次策略评估： $O(|S|^2 \times |A|)$ 每次迭代，策略评估需要多次迭代（记作$J$），所以一次策略评估步骤为 $O(J \times |S|^2 \times |A|)$
+  - 策略改进： $O(|S|^2 \times |A|)$
+  - 总复杂度： $O(K \times (J \times |S|^2 \times |A| + |S|^2 \times |A|))$，其中 $K$ 是策略迭代次数，$J$ 是策略评估的迭代次数。
   - 策略迭代次数 $K$ 通常很少，因为策略会快速收敛。
 
 - **空间复杂度 (Space Complexity)**： 
@@ -300,15 +297,11 @@ $
     - 解决序列决策问题中的长期累积奖励最大化问题
 
 - **数学表达**: 
-$
-v^*(s) = \max\limits_{a \in A} \left[ \sum\limits_{r} p(r\|s,a)r + \gamma \sum\limits_{s'} p(s'\|s,a)v^*(s') \right]
-$
+$$v^*(s) = \max\limits_{a \in A} \left[ \sum\limits_{r} p(r\|s,a)r + \gamma \sum\limits_{s'} p(s'\|s,a)v^*(s') \right]$$
 
 #### 算法原理
 - **数学基础**：基于贝尔曼最优方程 (Bellman Optimality Equation)：
-$
-v^*(s) = \max_{\pi\in\Pi} \sum_{a \in A(s)}\pi_k(a|s)\left[ \sum\limits_{r} p(r\|s,a)r + \gamma \sum\limits_{s'} p(s'\|s,a)v^*(s') \right]
-$
+$$v^*(s) = \max_{\pi\in\Pi} \sum_{a \in A(s)}\pi_k(a|s)\left[ \sum\limits_{r} p(r\|s,a)r + \gamma \sum\limits_{s'} p(s'\|s,a)v^*(s') \right]$$
 
 - **核心思想**：通过迭代方式逐步改进值函数估计，直至收敛到最优值函数。
 
@@ -325,8 +318,8 @@ $
 - **动作空间 (Action Space)**: $A(s)$ - 在状态 $s$ 下可用的动作集合
 - **状态转移概率 (State Transition Probabilities)**: $p(s'\|s,a)$ - 从状态 $s$ 执行动作 $a$ 后转移到状态 $s'$ 的概率
 - **奖励概率 (Reward Probabilities)**: $p(r\|s,a)$ - 在状态 $s$ 执行动作 $a$ 获得奖励 $r$ 的概率
-- **折扣因子 (Discount Factor)**: $\gamma \in [0, 1]$ - 未来奖励的折扣系数，$\gamma = 0$表示只考虑即时奖励，$\gamma = 1$表示平等对待所有未来奖励
-- **收敛阈值 (Convergence Threshold)**: $\epsilon > 0$ - 值函数收敛的判断标准，通常取较小的正数（如10⁻⁶）
+- **折扣因子 (Discount Factor)**: $\gamma \in [0, 1]$ - 未来奖励的折扣系数，$\gamma = 0$ 表示只考虑即时奖励，$\gamma = 1$ 表示平等对待所有未来奖励
+- **收敛阈值 (Convergence Threshold)**: $\epsilon > 0$ - 值函数收敛的判断标准，通常取较小的正数（如 $10^{-6}$）
 - **初始值函数估计 (Initial Value Function Estimate)**: $v_0(s)$ - 对每个状态 $s \in S$ 的初始价值估计，可以设为0或随机值
 - **最大迭代次数** $K_{max}$（防止无限循环的保险措施）
 
@@ -356,26 +349,18 @@ $
    
    - **动作评估 (Action Evaluation)**：对每个动作 $a \in A(s)$ 计算：
      - **期望即时奖励**：
-$ 
-\mathbb{E}[r\|s,a] = \sum_r p(r\|s,a) \cdot r 
-$
+$$ \mathbb{E}[r\|s,a] = \sum_r p(r\|s,a) \cdot r $$
        - 计算在当前状态执行特定动作的期望即时奖励
      - **期望未来价值**：
-$ 
-\mathbb{E}[v_k(s')\|s,a] = \sum_{s'} p(s'\|s,a) \cdot v_k(s') 
-$
+$$ \mathbb{E}[v_k(s')\|s,a] = \sum_{s'} p(s'\|s,a) \cdot v_k(s') $$
        - 计算在当前状态执行特定动作后的期望未来累积奖励
      - **Q值计算 (Q-value Calculation)**：
-$ 
-q_k(s,a) = \mathbb{E}[r\|s,a] + \gamma \cdot \mathbb{E}[v_k(s')\|s,a] 
-$
+$$ q_k(s,a) = \mathbb{E}[r\|s,a] + \gamma \cdot \mathbb{E}[v_k(s')\|s,a] $$
        - 综合即时奖励和未来价值的全面评估
    
    - **最优动作选择 (Optimal Action Selection)**：
      - 找到使Q值最大化的动作：
-$ 
-a_k^*(s) = \arg\max_{a \in A(s)} q_k(s,a) 
-$
+$$ a_k^*(s) = \arg\max_{a \in A(s)} q_k(s,a) $$
      - **平局处理策略**：如果多个动作产生相同的最大值：
        - 随机选择一个
        - 选择索引最小的动作
@@ -383,23 +368,17 @@ $
    
    - **策略更新 (Policy Update)**：
      - 为状态 $s$ 设置确定性策略：
-$ 
-\pi_{k+1}(a\|s) = \begin{cases} 1 & \text{若 } a = a_k^*(s) \\ 0 & \text{否则} \end{cases} 
-$
+$$ \pi_{k+1}(a\|s) = \begin{cases} 1 & \text{若 } a = a_k^*(s) \\ 0 & \text{否则} \end{cases} $$
      - 策略是确定性的，每个状态对应一个最优动作
    
    - **值函数更新 (Value Function Update)**：
      - 使用最大Q值更新状态值：
-$ 
-v_{k+1}(s) = \max_{a \in A(s)} q_k(s,a) = q_k(s, a_k^*(s)) 
-$
+$$ v_{k+1}(s) = \max_{a \in A(s)} q_k(s,a) = q_k(s, a_k^*(s)) $$
      - 这相当于执行一次贝尔曼最优算子
 
 3. **全局收敛检查 (Global Convergence Check)**：
    - 计算值函数最大变化量：
-$ 
-\Delta = \max_{s \in S} \|v_{k+1}(s) - v_k(s)\| 
-$
+$$ \Delta = \max_{s \in S} \|v_{k+1}(s) - v_k(s)\| $$
    - 如果 $\Delta < \epsilon$，则设置 converged = True
    - 迭代计数器递增：$k \leftarrow k + 1$
 
