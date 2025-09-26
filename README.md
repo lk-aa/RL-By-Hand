@@ -157,7 +157,7 @@ $
 2. **策略改进 (Policy Improvement)**：
    - 目标：根据当前值函数 $v_{\pi_k}$ 改进策略
    - 对于每个状态 $s \in S$：
-     - 对于每个动作 $a \in A(s)$，计算动作值函数：$$q_{\pi_k}(s,a) = \sum_r p(r|s,a)r + \gamma \sum_{s'} p(s'|s,a) v_{\pi_k}(s')$$
+     - 对于每个动作 $a \in A(s)$，计算动作值函数：$q_{\pi_k}(s,a) = \sum_r p(r|s,a)r + \gamma \sum_{s'} p(s'|s,a) v_{\pi_k}(s')$
      - 选择贪婪动作： $a_k^*(s) = \arg\max_{a \in A(s)} q_{\pi_k}(s,a)$
      - 更新策略： $\pi_{k+1}(a|s) = 1$ 如果 $a = a_k^*(s)$，否则为0（确定性策略）
 
@@ -297,11 +297,11 @@ $
     - 解决序列决策问题中的长期累积奖励最大化问题
 
 - **数学表达**: 
-$$v^*(s) = \max\limits_{a \in A} \left[ \sum\limits_{r} p(r\|s,a)r + \gamma \sum\limits_{s'} p(s'\|s,a)v^*(s') \right]$$
+$v^*(s) = \max\limits_{a \in A} \left[ \sum\limits_{r} p(r\|s,a)r + \gamma \sum\limits_{s'} p(s'\|s,a)v^*(s') \right]$
 
 #### 算法原理
 - **数学基础**：基于贝尔曼最优方程 (Bellman Optimality Equation)：
-$$v^*(s) = \max_{\pi\in\Pi} \sum_{a \in A(s)}\pi_k(a|s)\left[ \sum\limits_{r} p(r\|s,a)r + \gamma \sum\limits_{s'} p(s'\|s,a)v^*(s') \right]$$
+$v^*(s) = \max_{\pi\in\Pi} \sum_{a \in A(s)}\pi_k(a|s)\left[ \sum\limits_{r} p(r\|s,a)r + \gamma \sum\limits_{s'} p(s'\|s,a)v^*(s') \right]$
 
 - **核心思想**：通过迭代方式逐步改进值函数估计，直至收敛到最优值函数。
 
@@ -324,11 +324,11 @@ $$v^*(s) = \max_{\pi\in\Pi} \sum_{a \in A(s)}\pi_k(a|s)\left[ \sum\limits_{r} p(
 - **最大迭代次数** $K_{max}$（防止无限循环的保险措施）
 
 #### 初始化阶段
-- **设置迭代计数器**：$k = 0$
+- **设置迭代计数器**： $k = 0$
 - **初始化值函数**：
   $v_0(s)$ 对所有状态 $s \in S$
   - 常见初始化方法：全零初始化、随机初始化、基于启发式的初始化
-- **初始化策略**：$\pi_0$ 
+- **初始化策略**： $\pi_0$ 
   - 可以是任意策略或基于初始值函数的贪婪策略
   - 初始策略对最终结果无影响，但可能影响收敛速度
 - **设置收敛标志**：converged = False
@@ -341,7 +341,7 @@ $$v^*(s) = \max_{\pi\in\Pi} \sum_{a \in A(s)}\pi_k(a|s)\left[ \sum\limits_{r} p(
 </div>
 
 1. **收敛判断 (Convergence Check)**：
-   当 $\|v_k - v_{k-1}\|_\infty > \epsilon$ 且 $k < K_{max}$ 时继续迭代
+   当 $\|v_k-v_{k-1}\|_\infty>\epsilon$ 且 $k < K_{max}$ 时继续迭代
    - 使用无穷范数确保所有状态的值函数变化都小于阈值
 
 2. **状态遍历 (State Iteration)**：对每个状态 $s \in S$ 执行以下操作：
@@ -349,18 +349,18 @@ $$v^*(s) = \max_{\pi\in\Pi} \sum_{a \in A(s)}\pi_k(a|s)\left[ \sum\limits_{r} p(
    
    - **动作评估 (Action Evaluation)**：对每个动作 $a \in A(s)$ 计算：
      - **期望即时奖励**：
-$$ \mathbb{E}[r\|s,a] = \sum_r p(r\|s,a) \cdot r $$
+$ \mathbb{E}[r\|s,a] = \sum_r p(r\|s,a) \cdot r $
        - 计算在当前状态执行特定动作的期望即时奖励
      - **期望未来价值**：
-$$ \mathbb{E}[v_k(s')\|s,a] = \sum_{s'} p(s'\|s,a) \cdot v_k(s') $$
+$ \mathbb{E}[v_k(s')\|s,a] = \sum_{s'} p(s'\|s,a) \cdot v_k(s') $
        - 计算在当前状态执行特定动作后的期望未来累积奖励
      - **Q值计算 (Q-value Calculation)**：
-$$ q_k(s,a) = \mathbb{E}[r\|s,a] + \gamma \cdot \mathbb{E}[v_k(s')\|s,a] $$
+$ q_k(s,a) = \mathbb{E}[r\|s,a] + \gamma \cdot \mathbb{E}[v_k(s')\|s,a] $
        - 综合即时奖励和未来价值的全面评估
    
    - **最优动作选择 (Optimal Action Selection)**：
      - 找到使Q值最大化的动作：
-$$ a_k^*(s) = \arg\max_{a \in A(s)} q_k(s,a) $$
+$ a_k^*(s) = \arg\max_{a \in A(s)} q_k(s,a) $
      - **平局处理策略**：如果多个动作产生相同的最大值：
        - 随机选择一个
        - 选择索引最小的动作
@@ -368,19 +368,19 @@ $$ a_k^*(s) = \arg\max_{a \in A(s)} q_k(s,a) $$
    
    - **策略更新 (Policy Update)**：
      - 为状态 $s$ 设置确定性策略：
-$$ \pi_{k+1}(a\|s) = \begin{cases} 1 & \text{若 } a = a_k^*(s) \\ 0 & \text{否则} \end{cases} $$
+$ \pi_{k+1}(a\|s) = \begin{cases} 1 & \text{若 } a = a_k^*(s) \\ 0 & \text{否则} \end{cases} $
      - 策略是确定性的，每个状态对应一个最优动作
    
    - **值函数更新 (Value Function Update)**：
      - 使用最大Q值更新状态值：
-$$ v_{k+1}(s) = \max_{a \in A(s)} q_k(s,a) = q_k(s, a_k^*(s)) $$
+$ v_{k+1}(s) = \max_{a \in A(s)} q_k(s,a) = q_k(s, a_k^*(s)) $
      - 这相当于执行一次贝尔曼最优算子
 
 3. **全局收敛检查 (Global Convergence Check)**：
    - 计算值函数最大变化量：
-$$ \Delta = \max_{s \in S} \|v_{k+1}(s) - v_k(s)\| $$
-   - 如果 $\Delta < \epsilon$，则设置 converged = True
-   - 迭代计数器递增：$k \leftarrow k + 1$
+$ \Delta = \max_{s \in S} \|v_{k+1}(s) - v_k(s)\| $
+   - 如果 $\Delta<\epsilon$，则设置 converged = True
+   - 迭代计数器递增：$k\leftarrow{k + 1}$
 
 <div style="background:rgba(179, 190, 197, 0.94); padding: 10px; border-radius: 5px; margin: 5px 0;"> 
 <strong>主迭代循环结束</strong>
@@ -397,15 +397,15 @@ $$ \Delta = \max_{s \in S} \|v_{k+1}(s) - v_k(s)\| $$
   - $v^*$ 满足贝尔曼最优方程
   - $\pi^*$ 是相对于初始状态分布的最优策略
   - 对于充分小的 $\epsilon$，得到的策略是 $\epsilon$-最优的
-  - 误差界限：$\|v_k - v^*\|_\infty \leq \frac{\gamma^k}{1-\gamma} \|v_1 - v_0\|_\infty$
+  - 误差界限： $\|v_k - v^*\|_\infty \leq \frac{\gamma^k}{1-\gamma} \|v_1 - v_0\|_\infty$
 - **验证方法**：可以通过策略评估验证所得策略的性能
 
 #### 算法复杂度分析
 - **时间复杂度 (Time Complexity)**： 
-  - 每次迭代：$O(\|S\|^2 \times \|A\|)$
-  - 总复杂度：$O(K \times \|S\|^2 \times \|A\|)$，其中 $K$ 是迭代次数
+  - 每次迭代： $O(\|S\|^2 \times \|A\|)$
+  - 总复杂度： $O(K \times \|S\|^2 \times \|A\|)$，其中 $K$ 是迭代次数
   - 迭代次数 $K$ 取决于 $\gamma$ 和 $\epsilon$，通常为 $O\left(\frac{\log(1/\epsilon)}{1-\gamma}\right)$
-  - 迭代次数上界：$K = \left\lceil \frac{\log(\epsilon(1-\gamma)) - \log(\|v_1 - v_0\|_\infty)}{\log(\gamma)} \right\rceil$
+  - 迭代次数上界： $K = \left\lceil \frac{\log(\epsilon(1-\gamma)) - \log(\|v_1 - v_0\|_\infty)}{\log(\gamma)} \right\rceil$
 
 - **空间复杂度 (Space Complexity)**： 
   - $O(\|S\| \times \|A\|)$ 存储转移概率和奖励函数
@@ -413,8 +413,8 @@ $$ \Delta = \max_{s \in S} \|v_{k+1}(s) - v_k(s)\| $$
   - $O(\|S\|)$ 存储策略
 
 - **收敛速率 (Convergence Rate)**： 
-  - 线性收敛：$\|v_{k+1} - v^*\|_\infty \leq \gamma \|v_k - v^*\|_\infty$
-  - 误差界限：$\|v_k - v^*\|_\infty \leq \frac{\gamma^k}{1-\gamma} \|v_1 - v_0\|_\infty$
+  - 线性收敛： $\|v_{k+1} - v^*\|_\infty \leq \gamma \|v_k - v^*\|_\infty$
+  - 误差界限： $\|v_k - v^*\|_\infty \leq \frac{\gamma^k}{1-\gamma} \|v_1 - v_0\|_\infty$
 
 #### 关键性质
 - **单调改进 (Monotonic Improvement)**: $v_{k+1}(s) \geq v_k(s)$ 对所有 $s \in S$
