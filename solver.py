@@ -191,6 +191,56 @@ class Solver:
         
         return improved_policy, state_value_k
 
+    def calculate_state_values_from_qvalues(
+            self, 
+            qvalues: np.ndarray, 
+            policy: Optional[np.ndarray] = None
+        ) -> np.ndarray:
+        """
+        从状态-动作值函数（Q-values）计算状态值函数（State Values）
+        
+        根据给定的状态-动作值函数和策略，计算每个状态的价值。如果不提供策略，
+        则使用贪心策略（每个状态选择最大Q值的动作）。
+        
+        两种计算方式：
+            1. 贪心策略（默认）：v(s) = max_a Q(s,a)
+            2. 给定策略：v(s) = Σ_a π(a|s)·Q(s,a)
+        
+        算法流程：
+            1. 对于每个状态 s ∈ S
+            2. 如果提供了策略 π，则计算所有动作的加权平均值：Σ_a π(a|s)·Q(s,a)
+            3. 如果未提供策略，则取该状态下所有动作的最大值：max_a Q(s,a)
+            4. 将计算结果保存到状态值函数中
+        
+        Args:
+            qvalues: 状态-动作值函数矩阵，形状为(state_space_size, action_space_size)
+                     qvalues[state, action] 表示在状态state执行动作action的期望累积奖励
+            policy: 策略矩阵，形状为(state_space_size, action_space_size)，
+                    表示在每个状态选择每个动作的概率。如果为None，则使用贪心策略
+        
+        Returns:
+            state_values: 状态值函数数组，形状为(state_space_size,)
+                          表示每个状态的期望累积奖励
+        
+        Notes:
+            - 贪心策略下，状态值等于该状态下最优动作的Q值
+            - 给定策略下，状态值等于该策略下所有可能动作的Q值的加权平均
+            - 状态值函数是策略评估的核心结果，用于策略改进
+        """
+        # 初始化状态值函数
+        state_values = np.zeros(shape=self.state_space_size)
+        
+        # 对每个状态计算其价值
+        for state in range(self.state_space_size):
+            if policy is None:
+                # 使用贪心策略：取该状态下所有动作的最大Q值
+                state_values[state] = np.max(qvalues[state])
+            else:
+                # 使用给定策略：计算所有动作的加权平均Q值
+                state_values[state] = np.sum(policy[state] * qvalues[state])
+        
+        return state_values
+
     def calculate_qvalue(
             self, 
             state: int, 
@@ -413,7 +463,7 @@ class Solver:
             episode: 一个episode的轨迹，每个元素为一个字典，包含状态、动作、奖励、下一个状态和下一个动作
         """
         # 重置环境
-        observation, _ = self.env.reset({'start': start_state})
+        observation, _ = self.env.reset(seed=42, options={'start': start_state})
         # self.env.agent_location = self.env.state2pos(start_state)
         episode = []
         next_action = start_action
@@ -442,63 +492,155 @@ class Solver:
     def mc_basic(
             self, 
             length: int = 30, 
-            epochs: int = 10
-        ):
-        """
-        蒙特卡洛基本算法，用于估计状态-动作值函数
-        每次迭代时，对每个 state-action 对进行采样，计算从该 state-action 对开始的轨迹的总奖励，
-        并将该奖励作为该 state-action 对的估计值。
-        最后，根据每个 state-action 对的估计值，选择最优动作。
-
+            max_iteration: int = 10
+        ) -> Tuple[np.ndarray, np.ndarray]:
+        f"""
+        蒙特卡洛基本算法（Monte Carlo Basic Algorithm）
+        
+        这是一个**模型无关的策略迭代变体**（model-free variant of policy iteration），
+        通过直接与环境交互采样轨迹，估计状态-动作值函数，并迭代改进策略。
+        
+        算法原理：
+            - 不需要知道环境的转移概率P和奖励函数R
+            - 通过经验学习：直接从实际或模拟的经验中学习
+            - 采用"评估-改进"的迭代框架
+            - 每个状态-动作对从固定起点开始采样
+        
+        算法流程（对应伪代码）：
+            1. 初始化：创建一个随机贪心策略 π0 作为初始策略
+            2. 对于第k次迭代 (k = 0, 1, 2, ..., max_iteration-1)：
+                a. 对于每个状态 s ∈ S：
+                    i. 对于每个动作 a ∈ A(s)：
+                        - 生成一个或足够多个从状态s、动作a开始的轨迹（episode），遵循当前策略 π_k
+                        策略评估（Policy evaluation）：
+                             q_{π_k}(s, a) ≈ q_k(s, a) = average return of all the episodes starting from (s, a)
+                        - 计算该轨迹或多条轨迹的折扣回报，并求解平均回报（average return）g
+                        - 将回报g作为状态-动作值函数的估计 q_k(s,a) = g
+                    ii. 策略改进（Policy improvement）：
+                        - 找到使q_k(s,a)最大的动作 a*_k(s) = arg max_a q_k(s,a)
+                        - 更新策略：π_{k+1}(a|s) = 1 如果 a = a*_k，否则 π_{k+1}(a|s) = 0
+            3. 返回最终的策略 π_k 和状态-动作值函数 q_k
+        
+        具体实现：
+            - 轨迹生成：使用obtain_episode方法生成从指定状态-动作对开始的轨迹
+            - 回报计算：从后向前计算折扣回报总和，使用γ作为折扣因子
+            - 策略表示：使用确定性策略，每个状态只选择一个动作（概率为1）
+        
         Args:
-            length: 每一个 state-action 对的长度
-            epochs: 迭代次数
-
+            length: 每个状态-动作对生成的轨迹长度
+            max_iteration: 算法的最大迭代次数，控制策略改进的迭代轮数
+        
         Returns:
-            policy: 最优策略
+            policy: 最终的最优策略 π，形状为(state_space_size, action_space_size)
+                   其中policy[state, action]表示在状态state选择动作action的概率
+            qvalue: 最终的状态-动作值函数 q，形状为(state_space_size, action_space_size)
+                   其中qvalue[state, action]表示在状态state执行动作action的期望累积奖励
+        
+        Notes:
+            - 该算法是蒙特卡洛策略迭代（Monte Carlo Policy Iteration）的一个简化版本
+            - 每次迭代中，每个状态-动作对生成多条轨迹的平均值
+            - 在代码中，由于策略是确定性策略，所以每个状态-动作对只生成一条轨迹，而不是多条轨迹的平均值
+            - 单轨迹估计方法收敛性较弱，但实现简单，计算效率高
+            - 在实际应用中，通常需要增加探索机制或多次采样来提高算法的稳定性
         """
+        # 初始化策略
         self.policy = self.random_greedy_policy()
-        for epoch in range(epochs):
+        # 初始化状态-动作值函数
+        self.qvalue = np.zeros(shape=(self.state_space_size, self.action_space_size))
+        # 目标：寻找最优策略 Optimal Policy
+        for epoch in range(max_iteration):
             for state in range(self.state_space_size):
                 for action in range(self.action_space_size):
-                    episode = self.obtain_episode(self.policy, state, action, length)
+                    episode = self.obtain_episode(
+                        policy=self.policy, 
+                        start_state=state, 
+                        start_action=action, 
+                        length=length
+                    )
+                    # Policy Evaluation  计算从该 state-action 对开始的轨迹的总奖励
+                    # 使用的是折扣奖励和，折扣因子为 self.gamma
                     g = 0
                     for step in range(len(episode) - 1, -1, -1):
-                        g = episode[step]['reward'] + self.gama * g
+                        g = episode[step]['reward'] + self.gamma * g
                     self.qvalue[state][action] = g
+                # Policy Improvement  根据状态-动作值函数选择最优动作，贪心策略
                 qvalue_star = self.qvalue[state].max()
                 action_star = self.qvalue[state].tolist().index(qvalue_star)
                 self.policy[state] = np.zeros(shape=self.action_space_size)
                 self.policy[state, action_star] = 1
             print(epoch)
-        return self.policy
+        return self.policy, self.qvalue
 
     def mc_exploring_starts(
             self, 
             length: int = 30,
-            visit_type: str = 'first'   
-        ):
+            visit_type: str = 'first',
+            max_iteration: int = 1000
+        ) -> Tuple[np.ndarray, np.ndarray]:
         """
-        蒙特卡洛探索开始算法，用于估计状态-动作值函数
-        每次迭代时，对每个 state-action 对进行采样，计算从该 state-action 对开始的轨迹的总奖励，
-        并将该奖励作为该 state-action 对的估计值。
-        最后，根据每个 state-action 对的估计值，选择最优动作。
-
+        蒙特卡洛探索开始算法（Monte Carlo Exploring Starts Algorithm）
+        
+        这是一个**蒙特卡洛基本算法的高效变体**（efficient variant of MC Basic Algorithm），
+        通过探索开始（Exploring Starts）条件确保所有状态-动作对都能被充分探索，
+        从而更高效地估计状态-动作值函数并改进策略。
+        
+        算法原理：
+            - 模型无关（model-free）：不需要知道环境的转移概率P和奖励函数R
+            - 经验学习：直接从实际或模拟的经验中学习
+            - 探索开始条件：确保每个状态-动作对都有可能作为轨迹的起点
+            - 采用增量式更新：每次采样后立即更新值函数和策略
+        
+        算法流程（对应伪代码）：
+            1. 初始化：
+               - 创建一个随机贪心策略 π0 作为初始策略
+               - 初始化状态-动作值函数 q(s,a) = 0 对所有 (s,a)
+               - 初始化返回值累加器 Returns(s,a) = 0 和访问计数器 Num(s,a) = 0 对所有 (s,a)
+            2. 迭代直到策略收敛或达到最大迭代次数：
+               a. 对于每个状态 s ∈ S：
+                   i. 对于每个动作 a ∈ A(s)：
+                       - 生成一个从状态s、动作a开始的轨迹（episode），遵循当前策略π
+                       - 从后向前遍历轨迹中的每个步骤：
+                           * 计算从该步骤开始的折扣回报总和 g
+                           * 根据访问类型（首次访问或每次访问）决定是否更新
+                           * 更新返回值累加器和访问计数器
+                           * 策略评估：q(s,a) ← Returns(s,a)/Num(s,a)
+                           * 策略改进：π(a|s) = 1 如果 a = arg max_a q(s,a)，否则 π(a|s) = 0
+            3. 返回最终的策略 π和状态-动作值函数 q
+        
+        具体实现：
+            - 轨迹生成：使用obtain_episode方法生成从指定状态-动作对开始的轨迹
+            - 回报计算：从后向前计算折扣回报总和，使用γ作为折扣因子
+            - 访问类型：支持'first'（首次访问，仅更新第一次出现的状态-动作对）和'every'（每次访问，更新所有出现的状态-动作对）
+            - 策略表示：使用确定性策略，每个状态只选择一个动作（概率为1）
+            - 收敛条件：使用策略变化的1-范数作为收敛指标
+        
         Args:
-            length: 每一个 state-action 对的长度
-            visit_type: 访问类型，'first'表示仅计算第一次访问，'every'表示计算每一次访问
-
+            length: 每个轨迹的最大长度
+            visit_type: 访问类型，'first'表示仅计算首次访问，'every'表示计算每次访问
+            max_iteration: 最大迭代次数，防止算法不收敛时陷入死循环
+        
         Returns:
-            policy: 最优策略
+            policy: 最终的最优策略 π，形状为(state_space_size, action_space_size)
+                   其中policy[state, action]表示在状态state选择动作action的概率
+            qvalue: 最终的状态-动作值函数 q，形状为(state_space_size, action_space_size)
+                   其中qvalue[state, action]表示在状态state执行动作action的期望累积奖励
+        
+        Notes:
+            - 探索开始条件是该算法的关键特性，确保了策略空间的充分探索
+            - 与MC Basic相比，该算法在每次迭代中使用增量式更新，效率更高
+            - 首次访问（first-visit）方法在理论上收敛性更好，但每次访问（every-visit）方法在实践中更常用
+            - 当环境状态空间和动作空间较小时，该算法能够快速收敛到最优策略
         """
         self.policy = self.random_greedy_policy()
-        policy = self.mean_policy.copy()
-        qvalue = np.zeros(shape=(self.state_space_size, self.action_space_size))
-        # returns = [[[0 for row in range(1)] for col in range(5)] for block in range(25)]
+        policy_previous = self.mean_policy.copy()
+        self.qvalue = np.zeros(shape=(self.state_space_size, self.action_space_size))
         returns = np.zeros(shape=(self.state_space_size, self.action_space_size))
         nums = np.zeros(shape=(self.state_space_size, self.action_space_size))
-        while np.linalg.norm(policy - self.policy, ord=1) > 0.001:
-            policy = self.policy.copy()
+
+        epoch = 0
+        while np.linalg.norm(self.policy - policy_previous, ord=1) > 0.001 and epoch < max_iteration:
+            epoch += 1
+            policy_previous = self.policy.copy()
             for state in range(self.state_space_size):
                 for action in range(self.action_space_size):
                     episode = self.obtain_episode(
@@ -513,20 +655,23 @@ class Solver:
                         reward = episode[step]['reward']
                         state = episode[step]['state']
                         action = episode[step]['action']
-                        g = self.gama * g + reward
+                        g = self.gamma * g + reward
                         # first visit
                         if visit_type == 'first' and [state, action] in visit_list:
                             continue
                         
                         visit_list.append([state, action])
-                        nums[state, action] += 1
                         returns[state, action] += g
-                        qvalue[state, action] = returns[state, action] / nums[state, action]
-                        qvalue_star = qvalue[state].max()
-                        action_star = qvalue[state].tolist().index(qvalue_star)
+                        nums[state, action] += 1
+                        # Policy evaluation
+                        self.qvalue[state, action] = returns[state, action] / nums[state, action]
+                        # Policy improvement
+                        qvalue_star = self.qvalue[state].max()
+                        action_star = self.qvalue[state].tolist().index(qvalue_star)
                         self.policy[state] = np.zeros(shape=self.action_space_size).copy()
                         self.policy[state, action_star] = 1
-            print(np.linalg.norm(policy - self.policy, ord=1))
+            print(np.linalg.norm(self.policy - policy_previous, ord=1))
+        return self.policy, self.qvalue
 
     def mc_epsilon_greedy(
             self, 
@@ -657,14 +802,21 @@ if __name__ == "__main__":
     # 创建求解器并运行值迭代算法
     solver = Solver(env, gamma=0.9)
     start_time = time.time()
-    policy, state_value, remaining_iterations = solver.value_iteration()
+    # policy, state_value, remaining_iterations = solver.value_iteration()
     # policy, state_value, remaining_iterations = solver.policy_iteration()
+    policy, qvalue = solver.mc_basic(
+        length=50,
+        max_iteration=10
+    )
+    solver.state_value = solver.calculate_state_values_from_qvalues(policy, qvalue)
 
     end_time = time.time()
     cost_time = end_time - start_time
-    print(f"值迭代算法耗时: {round(cost_time, 4)} 秒, 剩余迭代次数: {remaining_iterations}")
+    # print(f"值迭代算法耗时: {round(cost_time, 4)} 秒, 剩余迭代次数: {remaining_iterations}")
+    print(f"mc_basic 算法耗时: {round(cost_time, 4)} 秒")
     print(policy)
-    print(state_value)
+    print(qvalue)
+    print(solver.state_value)
 
     # 可视化策略和状态值
     solver.show_policy(policy=solver.policy, render_mode='show')

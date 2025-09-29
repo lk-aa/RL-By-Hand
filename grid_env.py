@@ -140,7 +140,8 @@ class GridWorldEnv(gym.Env):
         # 重置智能体位置，如果提供了新起点则使用新起点
         if options is not None and "start" in options:
             # 验证新起点的有效性
-            start_pos = np.array(options['start'])
+            start_pos = self.state2pos(options['start'])
+            start_pos = np.array(start_pos, dtype=int)
             if (start_pos[0] < 0 or start_pos[0] >= self.size or 
                 start_pos[1] < 0 or start_pos[1] >= self.size):
                 raise ValueError(f"新起点必须在网格范围内(0-{self.size-1})")
