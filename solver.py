@@ -463,8 +463,8 @@ class Solver:
             episode: 一个episode的轨迹，每个元素为一个字典，包含状态、动作、奖励、下一个状态和下一个动作
         """
         # 重置环境
-        observation, _ = self.env.reset(seed=42, options={'start': start_state})
-        # self.env.agent_location = self.env.state2pos(start_state)
+        observation, _ = self.env.reset(seed=None, options={'start': start_state})
+        self.env.agent_location = self.env.state2pos(start_state)
         episode = []
         next_action = start_action
         next_state = start_state
@@ -494,7 +494,7 @@ class Solver:
             length: int = 30, 
             max_iteration: int = 10
         ) -> Tuple[np.ndarray, np.ndarray]:
-        f"""
+        """
         蒙特卡洛基本算法（Monte Carlo Basic Algorithm）
         
         这是一个**模型无关的策略迭代变体**（model-free variant of policy iteration），
@@ -590,21 +590,21 @@ class Solver:
             - 探索开始条件：确保每个状态-动作对都有可能作为轨迹的起点
             - 采用增量式更新：每次采样后立即更新值函数和策略
         
-        算法流程（对应伪代码）：
+        算法流程（对应伪代码）：  \n
             1. 初始化：
                - 创建一个随机贪心策略 π0 作为初始策略
                - 初始化状态-动作值函数 q(s,a) = 0 对所有 (s,a)
-               - 初始化返回值累加器 Returns(s,a) = 0 和访问计数器 Num(s,a) = 0 对所有 (s,a)
+               - 初始化返回值累加器 Returns(s,a) = 0 和访问计数器 Num(s,a) = 0 对所有 (s,a)\n
             2. 迭代直到策略收敛或达到最大迭代次数：
-               a. 对于每个状态 s ∈ S：
-                   i. 对于每个动作 a ∈ A(s)：
-                       - 生成一个从状态s、动作a开始的轨迹（episode），遵循当前策略π
-                       - 从后向前遍历轨迹中的每个步骤：
-                           * 计算从该步骤开始的折扣回报总和 g
-                           * 根据访问类型（首次访问或每次访问）决定是否更新
-                           * 更新返回值累加器和访问计数器
-                           * 策略评估：q(s,a) ← Returns(s,a)/Num(s,a)
-                           * 策略改进：π(a|s) = 1 如果 a = arg max_a q(s,a)，否则 π(a|s) = 0
+                - 对于每个状态 s ∈ S：
+                    - 对于每个动作 a ∈ A(s)：
+                        - 生成一个从状态s、动作a开始的轨迹（episode），遵循当前策略π
+                        - 从后向前遍历轨迹中的每个步骤：
+                            * 计算从该步骤开始的折扣回报总和 g
+                            * 根据访问类型（首次访问或每次访问）决定是否更新
+                            * 更新返回值累加器和访问计数器
+                            * 策略评估：q(s,a) ← Returns(s,a)/Num(s,a)
+                            * 策略改进：π(a|s) = 1 如果 $a = arg max_a q(s,a)$，否则 π(a|s) = 0
             3. 返回最终的策略 π和状态-动作值函数 q
         
         具体实现：
@@ -638,11 +638,18 @@ class Solver:
         nums = np.zeros(shape=(self.state_space_size, self.action_space_size))
 
         epoch = 0
-        while np.linalg.norm(self.policy - policy_previous, ord=1) > 0.001 and epoch < max_iteration:
+        # while np.linalg.norm(self.policy - policy_previous, ord=1) > 0.001 and epoch < max_iteration:
+        while epoch < max_iteration:
             epoch += 1
             policy_previous = self.policy.copy()
+            # returns = np.zeros(shape=(self.state_space_size, self.action_space_size))
+            # nums = np.zeros(shape=(self.state_space_size, self.action_space_size))
             for state in range(self.state_space_size):
+                returns = np.zeros(shape=(self.state_space_size, self.action_space_size))
+                nums = np.zeros(shape=(self.state_space_size, self.action_space_size))
                 for action in range(self.action_space_size):
+                    # returns = np.zeros(shape=(self.state_space_size, self.action_space_size))
+                    # nums = np.zeros(shape=(self.state_space_size, self.action_space_size))
                     episode = self.obtain_episode(
                         policy=self.policy, 
                         start_state=state, 
@@ -659,18 +666,18 @@ class Solver:
                         # first visit
                         if visit_type == 'first' and [state, action] in visit_list:
                             continue
-                        
                         visit_list.append([state, action])
                         returns[state, action] += g
                         nums[state, action] += 1
                         # Policy evaluation
                         self.qvalue[state, action] = returns[state, action] / nums[state, action]
-                        # Policy improvement
-                        qvalue_star = self.qvalue[state].max()
-                        action_star = self.qvalue[state].tolist().index(qvalue_star)
-                        self.policy[state] = np.zeros(shape=self.action_space_size).copy()
-                        self.policy[state, action_star] = 1
-            print(np.linalg.norm(self.policy - policy_previous, ord=1))
+                # Policy improvement
+                for state in range(self.state_space_size):
+                    qvalue_star = self.qvalue[state].max()
+                    action_star = self.qvalue[state].tolist().index(qvalue_star)
+                    self.policy[state] = np.zeros(shape=self.action_space_size)
+                    self.policy[state, action_star] = 1
+
         return self.policy, self.qvalue
 
     def mc_epsilon_greedy(
@@ -804,9 +811,14 @@ if __name__ == "__main__":
     start_time = time.time()
     # policy, state_value, remaining_iterations = solver.value_iteration()
     # policy, state_value, remaining_iterations = solver.policy_iteration()
-    policy, qvalue = solver.mc_basic(
-        length=50,
-        max_iteration=10
+    # policy, qvalue = solver.mc_basic(
+    #     length=50,
+    #     max_iteration=10
+    # )
+    policy, qvalue = solver.mc_exploring_starts(
+        length=200,
+        visit_type='every',
+        max_iteration=20
     )
     solver.state_value = solver.calculate_state_values_from_qvalues(policy, qvalue)
 
